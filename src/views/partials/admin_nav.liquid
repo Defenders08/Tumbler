@@ -1,0 +1,12 @@
+{% comment %} Навигация админ-панели. Параметр: nav.active. {% endcomment %}
+<div class="dash-grid">
+  <div class="admin-wrap">
+    <nav class="admin-nav">
+      <a class="admin-tab {% if nav.active == 'summary' %}is-active{% endif %}" href="/admin">{{ 'admin.summary' | t: locale }}</a>
+      <a class="admin-tab {% if nav.active == 'reports' %}is-active{% endif %}" href="/admin/reports">{{ 'admin.reports' | t: locale }}</a>
+      <a class="admin-tab {% if nav.active == 'users' %}is-active{% endif %}" href="/admin/users">{{ 'admin.users' | t: locale }}</a>
+      <a class="admin-tab {% if nav.active == 'posts' %}is-active{% endif %}" href="/admin/posts">{{ 'admin.posts' | t: locale }}</a>
+      <a class="admin-tab {% if nav.active == 'logs' %}is-active{% endif %}" href="/admin/logs">{{ 'admin.logs' | t: locale }}</a>
+      <a class="admin-tab {% if nav.active == 'settings' %}is-active{% endif %}" href="/admin/settings">{{ 'admin.settings' | t: locale }}</a>
+    </nav>
+    <div class="admin-body">

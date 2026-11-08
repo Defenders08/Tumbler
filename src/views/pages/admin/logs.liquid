@@ -1,0 +1,12 @@
+{% layout 'layout' %}
+{% block content %}
+{% include 'partials/admin_nav' %}
+<div class="page-heading"><h1>{{ 'admin.logs' | t: locale }}</h1></div>
+{% if actions.size == 0 %}<p class="hint">{{ 'admin.no_actions' | t: locale }}</p>{% endif %}
+<ul class="log-list">
+  {% for a in actions %}
+  <li>{{ a.created_at | date: locale, user.timezone }} — <strong>{{ a.moderator_email }}</strong> — {{ a.action }} ({{ a.target_type }} #{{ a.target_id }}){% if a.reason %} — {{ a.reason }}{% endif %}</li>
+  {% endfor %}
+</ul>
+</div></div>
+{% endblock %}

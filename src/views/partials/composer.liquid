@@ -1,0 +1,138 @@
+{% comment %} Композер: карточка с 7 кнопками-типами и раскрывающимися формами (в духе 2012).
+     Формы раскрыты явно (без динамических include — liquidjs их не вычисляет).
+     Параметры: composerError, composerErrorNote, openType, values. {% endcomment %}
+<section class="card composer-card js-composer-card{% if openType %}{% else %} is-compact{% endif %}" id="composer">
+
+  {% if composerError %}
+  <div class="flash-banner flash-error" role="alert">
+    <strong>{{ composerError }}</strong>
+    {% if composerErrorNote %}<br><small>{{ composerErrorNote }}</small>{% endif %}
+  </div>
+  {% endif %}
+
+  {% assign defaultType = openType | default: 'text' %}
+  <div class="composer-types" role="tablist">
+    <span class="composer-avatar" aria-hidden="true">
+      {% if user.avatarKey %}
+      <img src="/media/{{ user.avatarKey }}" alt="">
+      {% else %}
+      <span class="avatar-letter">{{ user.blogSlug | slice: 0, 1 }}</span>
+      {% endif %}
+    </span>
+    <button type="button" class="composer-type js-composer-type{% if defaultType == 'text' %} is-active{% endif %}" data-type="text" aria-pressed="{% if defaultType == 'text' %}true{% else %}false{% endif %}">
+      <svg class="icon type-text"><use href="#i-text"/></svg><span>{{ 'composer.type_text' | t: locale }}</span>
+    </button>
+    <button type="button" class="composer-type js-composer-type" data-type="photo" aria-pressed="false">
+      <svg class="icon type-photo"><use href="#i-photo"/></svg><span>{{ 'composer.type_photo' | t: locale }}</span>
+    </button>
+    <button type="button" class="composer-type js-composer-type" data-type="quote" aria-pressed="false">
+      <svg class="icon type-quote"><use href="#i-quote"/></svg><span>{{ 'composer.type_quote' | t: locale }}</span>
+    </button>
+    <button type="button" class="composer-type js-composer-type" data-type="link" aria-pressed="false">
+      <svg class="icon type-link"><use href="#i-link"/></svg><span>{{ 'composer.type_link' | t: locale }}</span>
+    </button>
+    <button type="button" class="composer-type js-composer-type" data-type="audio" aria-pressed="false">
+      <svg class="icon type-audio"><use href="#i-audio"/></svg><span>{{ 'composer.type_audio' | t: locale }}</span>
+    </button>
+    <button type="button" class="composer-type js-composer-type" data-type="video" aria-pressed="false">
+      <svg class="icon type-video"><use href="#i-video"/></svg><span>{{ 'composer.type_video' | t: locale }}</span>
+    </button>
+    <button type="button" class="composer-type js-composer-type" data-type="gif" aria-pressed="false">
+      <svg class="icon type-gif"><use href="#i-gif"/></svg><span>{{ 'composer.type_gif' | t: locale }}</span>
+    </button>
+  </div>
+
+  <div class="composer-forms">
+    {% assign defaultType = openType | default: 'text' %}
+    <form class="composer-form js-composer-form" data-type="text" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'text' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="text">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/text', prefix: 'text-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'text-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+
+    <form class="composer-form js-composer-form" data-type="photo" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'photo' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="photo">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/photo', prefix: 'photo-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'photo-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+
+    <form class="composer-form js-composer-form" data-type="quote" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'quote' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="quote">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/quote', prefix: 'quote-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'quote-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+
+    <form class="composer-form js-composer-form" data-type="link" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'link' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="link">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/link', prefix: 'link-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'link-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+
+    <form class="composer-form js-composer-form" data-type="audio" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'audio' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="audio">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/audio', prefix: 'audio-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'audio-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+
+    <form class="composer-form js-composer-form" data-type="video" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'video' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="video">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/video', prefix: 'video-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'video-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+
+    <form class="composer-form js-composer-form" data-type="gif" method="post" action="/posts" enctype="multipart/form-data" {% if defaultType != 'gif' %}hidden{% endif %}>
+      <input type="hidden" name="type" value="gif">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      {% include 'partials/fields/gif', prefix: 'gif-', values: values, mode: 'new' %}
+      {% include 'partials/fields/common', prefix: 'gif-', values: values %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="draft" class="btn btn-secondary">{{ 'composer.save_draft' | t: locale }}</button>
+        <button type="submit" formaction="/posts/preview" formmethod="post" class="btn btn-secondary">{{ 'composer.preview' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-composer-collapse">{{ 'composer.collapse' | t: locale }}</button>
+      </div>
+    </form>
+  </div>
+</section>

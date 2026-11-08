@@ -1,0 +1,64 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page search-page">
+  <div class="page-heading">
+    <h1>{{ 'search.title' | t: locale }}</h1>
+  </div>
+
+  <div class="panel">
+  <form class="search-form" method="get" action="/search">
+    <input type="search" name="q" value="{{ q }}" maxlength="100" placeholder="{{ 'search.placeholder' | t: locale }}" autocomplete="off" autofocus>
+    <select name="type">
+      <option value="">{{ 'search.all_types' | t: locale }}</option>
+      {% for t in types %}
+      <option value="{{ t }}" {% if type == t %}selected{% endif %}>{{ 'composer.type_' | append: t | t: locale }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">{{ 'search.submit' | t: locale }}</button>
+  </form>
+
+  {% if q == '' %}
+    {% assign emptyText = 'search.hint' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+  {% else %}
+
+  {% if blogs.size > 0 %}
+  <h2 class="search-section">{{ 'search.blogs' | t: locale }}</h2>
+  <div class="search-blogs">
+    {% for b in blogs %}
+    <a class="search-blog card" href="/{{ b.slug }}">
+      {% if b.avatar_key %}<img src="/media/{{ b.avatar_key }}" alt="">
+      {% else %}<span class="avatar-letter">{{ b.slug | slice: 0, 1 }}</span>{% endif %}
+      <span class="sb-main">
+        <span class="sb-title">{{ b.title }}</span>
+        {% if b.description %}<span class="sb-desc">{{ b.description }}</span>{% endif %}
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if tags.size > 0 %}
+  <h2 class="search-section">{{ 'search.tags' | t: locale }}</h2>
+  <div class="post-tags">
+    {% for t in tags %}
+    <a class="tag tag-link" href="/tag/{{ t.name }}">#{{ t.name }} <span class="tag-count">{{ t.post_count }}</span></a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <h2 class="search-section">{{ 'search.posts' | t: locale }}{% if total > 0 %} — {{ total }}{% endif %}</h2>
+  {% if posts.size == 0 %}
+    {% assign emptyText = 'search.nothing' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+  {% else %}
+  {% for p in posts %}
+  {% include 'partials/post_card', post: p, tz: user.timezone, back: 'dashboard' %}
+  {% endfor %}
+  {% include 'partials/pagination', page: page, pages: pages, basePath: '/search' %}
+  {% endif %}
+
+  {% endif %}
+  </div>
+</div>
+{% endblock %}

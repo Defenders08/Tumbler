@@ -1,0 +1,10 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <p class="flash-banner flash-info">
+    {{ 'composer.preview' | t: locale }} ·
+    <a href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
+  </p>
+  {% include 'partials/post_card', post: post, tz: user.timezone, back: 'dashboard' %}
+</div>
+{% endblock %}

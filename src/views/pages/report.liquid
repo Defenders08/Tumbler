@@ -1,0 +1,35 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'report.title' | t: locale }}</h1>
+    <a class="btn btn-secondary btn-sm" href="{{ backHref }}">← {{ 'common.back' | t: locale }}</a>
+  </div>
+
+  {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
+
+  <section class="card form-card">
+    <p class="hint">{{ info }}</p>
+    <form method="post" action="/report/{{ targetType }}/{{ targetId }}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="back" value="{{ backHref }}">
+      <div class="field">
+        <label for="r-reason">{{ 'report.reason' | t: locale }}</label>
+        <select id="r-reason" name="reason">
+          <option value="spam">{{ 'report.spam' | t: locale }}</option>
+          <option value="abuse">{{ 'report.abuse' | t: locale }}</option>
+          <option value="nsfw">{{ 'report.nsfw' | t: locale }}</option>
+          <option value="other" selected>{{ 'report.other' | t: locale }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="r-details">{{ 'report.details' | t: locale }}</label>
+        <textarea id="r-details" name="details" rows="3" maxlength="500">{{ values.details }}</textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'report.send' | t: locale }}</button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

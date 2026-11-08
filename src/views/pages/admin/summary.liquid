@@ -1,0 +1,22 @@
+{% layout 'layout' %}
+{% block content %}
+{% include 'partials/admin_nav' %}
+<h2>{{ 'admin.summary' | t: locale }}</h2>
+<div class="admin-stats">
+  <div class="stat"><span class="stat-n">{{ counts.users }}</span><span>{{ 'admin.users' | t: locale }}</span></div>
+  <div class="stat"><span class="stat-n">{{ counts.posts }}</span><span>{{ 'search.posts' | t: locale }}</span></div>
+  <div class="stat"><span class="stat-n">{{ counts.comments }}</span><span>{{ 'social.comments' | t: locale }}</span></div>
+  <div class="stat"><span class="stat-n">{{ counts.asks }}</span><span>{{ 'ask.inbox' | t: locale }}</span></div>
+  <div class="stat stat-warn"><span class="stat-n">{{ counts.openReports }}</span><span>{{ 'admin.open_reports' | t: locale }}</span></div>
+  <div class="stat"><span class="stat-n">{{ counts.hidden }}</span><span>{{ 'admin.hidden_posts' | t: locale }}</span></div>
+  <div class="stat"><span class="stat-n">{{ counts.blockedUsers }}</span><span>{{ 'admin.blocked_users' | t: locale }}</span></div>
+</div>
+<h2>{{ 'admin.recent_actions' | t: locale }}</h2>
+{% if recentActions.size == 0 %}<p class="hint">{{ 'admin.no_actions' | t: locale }}</p>{% endif %}
+<ul class="log-list">
+  {% for a in recentActions %}
+  <li>{{ a.created_at | date: locale, user.timezone }} — <strong>{{ a.moderator_email }}</strong> — {{ a.action }} ({{ a.target_type }} #{{ a.target_id }}){% if a.reason %} — {{ a.reason }}{% endif %}</li>
+  {% endfor %}
+</ul>
+</div></div>
+{% endblock %}

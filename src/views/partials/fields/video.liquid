@@ -1,0 +1,17 @@
+{% comment %} Поля видео-поста. {% endcomment %}
+{% if mode == 'new' %}
+<div class="field">
+  <label for="{{ prefix }}file">{{ 'composer.file_video' | t: locale }}</label>
+  <input type="file" id="{{ prefix }}file" name="file" accept="video/mp4,video/webm,.mp4,.webm" required>
+</div>
+{% else %}
+<p class="hint">{{ 'composer.file_note' | t: locale }}</p>
+{% endif %}
+<div class="field">
+  <label for="{{ prefix }}title">{{ 'composer.title' | t: locale }}</label>
+  <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+</div>
+<div class="field">
+  <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
+  <textarea id="{{ prefix }}body" name="body" rows="3">{{ values.body }}</textarea>
+</div>

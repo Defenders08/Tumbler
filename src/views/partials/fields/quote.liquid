@@ -1,0 +1,9 @@
+{% comment %} Поля цитаты. {% endcomment %}
+<div class="field">
+  <label for="{{ prefix }}quote">{{ 'composer.quote' | t: locale }}</label>
+  <textarea id="{{ prefix }}quote" name="quote" rows="5" required>{{ values.quote }}</textarea>
+</div>
+<div class="field">
+  <label for="{{ prefix }}source">{{ 'composer.source' | t: locale }}</label>
+  <input type="text" id="{{ prefix }}source" name="source" maxlength="300" value="{{ values.source }}">
+</div>

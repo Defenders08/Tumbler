@@ -1,0 +1,34 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'ask.answer' | t: locale }}</h1>
+    <a class="btn btn-secondary btn-sm" href="/asks">← {{ 'ask.inbox' | t: locale }}</a>
+  </div>
+
+  {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
+
+  <section class="card ask-item">
+    <span class="ask-from">
+      {% if ask.is_anonymous %}
+      <strong>{{ 'ask.anonymous_short' | t: locale }}</strong>
+      {% elsif ask.from_slug %}
+      <strong>{{ ask.from_title }}</strong>
+      {% endif %}
+    </span>
+    <blockquote class="ask-question">{{ ask.question }}</blockquote>
+    <form method="post" action="/asks/{{ ask.id }}/answer">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div class="field">
+        <label for="answer">{{ 'ask.answer_label' | t: locale }}</label>
+        <textarea id="answer" name="body" rows="6" required>{{ values.body }}</textarea>
+        <p class="hint">Markdown</p>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'ask.answer_publish' | t: locale }}</button>
+        <a class="btn btn-secondary" href="/asks">{{ 'common.cancel' | t: locale }}</a>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

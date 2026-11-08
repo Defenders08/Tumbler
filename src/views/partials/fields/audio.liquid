@@ -1,0 +1,21 @@
+{% comment %} Поля аудио-поста: файл + необложка + название + подпись. {% endcomment %}
+{% if mode == 'new' %}
+<div class="field">
+  <label for="{{ prefix }}file">{{ 'composer.file_audio' | t: locale }}</label>
+  <input type="file" id="{{ prefix }}file" name="file" accept="audio/mpeg,audio/mp4,audio/ogg,.mp3,.m4a,.ogg" required>
+</div>
+<div class="field">
+  <label for="{{ prefix }}cover">{{ 'composer.file_avatar' | t: locale }}</label>
+  <input type="file" id="{{ prefix }}cover" name="cover" accept="image/jpeg,image/png,image/webp,image/gif">
+</div>
+{% else %}
+<p class="hint">{{ 'composer.file_note' | t: locale }}</p>
+{% endif %}
+<div class="field">
+  <label for="{{ prefix }}title">{{ 'composer.audio_title' | t: locale }}</label>
+  <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+</div>
+<div class="field">
+  <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
+  <textarea id="{{ prefix }}body" name="body" rows="3">{{ values.body }}</textarea>
+</div>

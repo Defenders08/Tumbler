@@ -1,0 +1,41 @@
+{% layout 'layout' %}
+{% block content %}
+{% include 'partials/admin_nav' %}
+<div class="page-heading">
+  <h1>{{ 'admin.users' | t: locale }}</h1>
+  <form method="get" action="/admin/users" class="inline-form search-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="email / slug">
+    <button type="submit" class="btn btn-secondary btn-sm">{{ 'search.submit' | t: locale }}</button>
+  </form>
+</div>
+
+{% for u in users %}
+<section class="card admin-item">
+  <p>
+    <strong>{{ u.email }}</strong>
+    {% if u.slug %}· <a href="/{{ u.slug }}">{{ u.slug }}</a>{% endif %}
+    · <span class="tag">{{ u.role }}</span>
+    · <span class="tag {% if u.status == 'blocked' %}tag-warn{% endif %}">{{ u.status }}</span>
+    · {{ u.created_at | date: locale, user.timezone }}
+  </p>
+  {% if u.role != 'admin' %}
+  <div class="form-actions">
+    {% if u.status == 'active' %}
+    <form method="post" action="/admin/users/{{ u.id }}/status" class="inline-form js-confirm" data-confirm="{{ 'admin.ban_confirm' | t: locale }}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="status" value="blocked">
+      <button type="submit" class="btn btn-danger btn-sm">{{ 'admin.ban' | t: locale }}</button>
+    </form>
+    {% else %}
+    <form method="post" action="/admin/users/{{ u.id }}/status" class="inline-form">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="status" value="active">
+      <button type="submit" class="btn btn-success btn-sm">{{ 'admin.unban' | t: locale }}</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+</div></div>
+{% endblock %}

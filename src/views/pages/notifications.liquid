@@ -1,0 +1,39 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'notify.title' | t: locale }}</h1>
+    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
+  </div>
+
+  {% if hadUnread > 0 %}<div class="flash-banner flash-info">{{ 'notify.marked_read' | t: locale, n: hadUnread }}</div>{% endif %}
+
+  <div class="panel">
+  {% if items.size == 0 %}
+    {% assign emptyText = 'notify.empty' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+    {% endif %}
+
+  <ul class="notify-list">
+    {% for n in items %}
+    <li class="notify-item {% if n.isUnread %}is-unread{% endif %}">
+      <a href="{{ n.link }}" class="notify-row">
+        {% if n.actor_slug %}
+        <span class="comment-avatar">
+          {% if n.actor_avatar_key %}<img src="/media/{{ n.actor_avatar_key }}" alt="">
+          {% else %}<span class="avatar-letter">{{ n.actor_slug | slice: 0, 1 }}</span>{% endif %}
+        </span>
+        {% else %}
+        <span class="comment-avatar"><span class="avatar-letter anon">?</span></span>
+        {% endif %}
+        <span class="notify-main">
+          <span class="notify-text">{% if n.type == 'like' %}<svg class="icon"><use href="#i-heart"/></svg>{% elsif n.type == 'reblog' %}<svg class="icon"><use href="#i-reblog"/></svg>{% elsif n.type == 'comment' %}<svg class="icon"><use href="#i-comment"/></svg>{% elsif n.type == 'follow' %}<svg class="icon"><use href="#i-user"/></svg>{% elsif n.type == 'ask' %}<svg class="icon"><use href="#i-mail"/></svg>{% endif %} {{ n.text }}</span>
+          <span class="notify-time">{{ n.created_at | date: locale, user.timezone }}</span>
+        </span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  </div>
+</div>
+{% endblock %}

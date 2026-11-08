@@ -1,0 +1,10 @@
+{% comment %} Пустое состояние с ASCII-котиком в духе старого веба.
+     Параметры: text (переведённая строка), hint (необязательно). {% endcomment %}
+<div class="empty-state">
+  <pre class="ascii-art" aria-hidden="true">   /\_/\
+  ( -.- )   zzz
+  /|   |\
+ (_|   |_)</pre>
+  <p>{{ text }}</p>
+  {% if hint %}<p class="empty-hint">{{ hint }}</p>{% endif %}
+</div>

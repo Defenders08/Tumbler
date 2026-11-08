@@ -1,0 +1,50 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="blog-wrap">
+  <header class="blog-header">
+    <span class="blog-avatar">
+      {% if blog.avatar_key %}
+      <img src="/media/{{ blog.avatar_key }}" alt="">
+      {% else %}
+      <span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span>
+      {% endif %}
+    </span>
+    <h1 class="blog-title"><a href="/{{ blog.slug }}">{{ blog.title }}</a></h1>
+    <p class="blog-description">{{ 'ask.title' | t: locale }}</p>
+  </header>
+
+  {% if sent %}
+  <div class="flash-banner flash-ok" role="status">{{ 'ask.sent' | t: locale }}</div>
+  {% endif %}
+  {% if error %}
+  <div class="flash-banner flash-error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <section class="card form-card ask-card">
+    {% if isOwner %}
+    <p class="hint">{{ 'ask.own_note' | t: locale }} <a href="/asks">{{ 'ask.inbox' | t: locale }} →</a></p>
+    {% endif %}
+    <form method="post" action="/{{ blog.slug }}/ask">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div class="field">
+        <label for="question">{{ 'ask.question' | t: locale }}</label>
+        <textarea id="question" name="question" rows="4" maxlength="500" required>{{ values.question }}</textarea>
+        <p class="hint">{{ 'ask.limit' | t: locale }}</p>
+      </div>
+      {% if blog.ask_anonymous %}
+      <label class="checkbox-field">
+        <input type="checkbox" name="anonymous" {% if values.anonymous == 'on' %}checked{% endif %}>
+        <span>{{ 'ask.anonymous' | t: locale }}</span>
+      </label>
+      {% endif %}
+      {% unless user %}{% if blog.ask_anonymous != true %}
+      <p class="guest-hint">{{ 'ask.login_note' | t: locale }} <a href="/login?back=/{{ blog.slug }}/ask">{{ 'nav.login' | t: locale }}</a></p>
+      {% endif %}{% endunless %}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'ask.send' | t: locale }}</button>
+        <a class="btn btn-secondary" href="/{{ blog.slug }}">{{ 'common.cancel' | t: locale }}</a>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

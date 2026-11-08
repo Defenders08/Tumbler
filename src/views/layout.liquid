@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title | default: 'tumbler' }} — tumbler</title>
+  <link rel="stylesheet" href="/static/css/tumbler.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  {% if csrfToken %}<meta name="csrf-token" content="{{ csrfToken }}">{% endif %}
+  {% if theme %}
+  {% comment %} Тема публичного блога: значения уже валидированы (hex-цвета, шрифт из списка). {% endcomment %}
+  <style>
+    body.blog-surface { background: {{ theme.bgColor }}; color: {{ theme.textColor }}; }
+    body.blog-surface a { color: {{ theme.accentColor }}; }
+    body.blog-surface .blog-header .muted, body.blog-surface .post-meta { color: {{ theme.textColor }}; opacity: .7; }
+    {% if theme.font == 'georgia' %}
+    body.blog-surface .content-font { font-family: Georgia, 'Times New Roman', serif; }
+    {% elsif theme.font == 'courier' %}
+    body.blog-surface .content-font { font-family: 'Courier New', Courier, monospace; }
+    {% endif %}
+  </style>
+  {% endif %}
+</head>
+<body class="{{ pageClass | default: 'dash' }}-page{% if pageClass == 'blog' %} blog-surface{% endif %}">
+  {% include 'partials/icons' %}
+  {% include 'partials/header' %}
+
+  <div class="app-shell">
+    <main class="page-main app-main">{% block content %}{% endblock %}</main>
+    {% if user and pageClass != 'auth' and pageClass != 'admin' %}
+    <aside class="app-sidebar">
+      {% include 'partials/side_rail' %}
+    </aside>
+    {% endif %}
+  </div>
+
+  {% if user and pageClass != 'auth' %}
+  <nav class="bottom-nav" aria-label="{{ 'nav.dashboard' | t: locale }}">
+    <a href="/dashboard" class="bottom-nav-item {% if currentPath == '/dashboard' %}is-active{% endif %}">
+      <svg class="icon"><use href="#i-home"/></svg><span>{{ 'nav.dashboard' | t: locale }}</span>
+    </a>
+    <a href="/search" class="bottom-nav-item {% if currentPath == '/search' %}is-active{% endif %}">
+      <svg class="icon"><use href="#i-search"/></svg><span>{{ 'search.title' | t: locale }}</span>
+    </a>
+    <a href="/drafts" class="bottom-nav-item {% if currentPath == '/drafts' %}is-active{% endif %}">
+      <svg class="icon"><use href="#i-pencil"/></svg><span>{{ 'nav.drafts' | t: locale }}</span>
+    </a>
+    <a href="/{{ user.blogSlug }}" class="bottom-nav-item">
+      <svg class="icon"><use href="#i-user"/></svg><span>{{ 'nav.my_blog' | t: locale }}</span>
+    </a>
+    <a href="/settings/blog" class="bottom-nav-item {% if currentPath == '/settings/blog' %}is-active{% endif %}">
+      <svg class="icon"><use href="#i-gear"/></svg><span>{{ 'nav.settings' | t: locale }}</span>
+    </a>
+  </nav>
+  {% endif %}
+
+  <script src="/static/js/tumbler.js" defer></script>
+</body>
+</html>

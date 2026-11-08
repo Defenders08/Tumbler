@@ -1,0 +1,18 @@
+{% layout 'layout' %}
+{% block content %}
+    {% include 'partials/composer', blog: blog, composerError: composerError, composerErrorNote: composerErrorNote, openType: openType, values: values %}
+
+    {% if flash %}<div class="flash-banner flash-ok" role="status">{{ flash }}</div>{% endif %}
+    {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
+
+    {% if posts.size == 0 %}
+    {% assign emptyHint = 'dashboard.feed_hint' | t: locale %}
+    {% assign emptyText = 'dashboard.empty' | t: locale, hint: emptyHint %}
+    {% endif %}
+
+    {% for p in posts %}
+    {% include 'partials/post_card', post: p, tz: user.timezone, back: 'dashboard' %}
+    {% endfor %}
+
+    {% include 'partials/pagination', page: page, pages: pages, basePath: '/dashboard' %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% layout 'layout' %}
+{% block content %}
+    <div class="page-heading">
+      <h1>{{ 'drafts.title' | t: locale }}</h1>
+      {% if flash %}<span class="flash-banner flash-ok" role="status">{{ flash }}</span>{% endif %}
+    </div>
+
+    {% if posts.size == 0 %}
+    {% assign emptyText = 'drafts.empty' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+    {% endif %}
+
+    {% for p in posts %}
+    {% include 'partials/post_card', post: p, tz: user.timezone, back: 'drafts' %}
+    {% endfor %}
+
+    {% include 'partials/pagination', page: page, pages: pages, basePath: '/drafts' %}
+{% endblock %}

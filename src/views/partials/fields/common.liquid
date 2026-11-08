@@ -1,0 +1,20 @@
+{% comment %} Общие поля: теги и 18+. Параметры: prefix, values. {% endcomment %}
+<div class="field">
+  <label for="{{ prefix }}tags">{{ 'composer.tags' | t: locale }}</label>
+  <input type="text" id="{{ prefix }}tags" name="tags" maxlength="400" value="{{ values.tags }}" autocomplete="off">
+</div>
+<label class="checkbox-field">
+  <input type="checkbox" name="nsfw" {% if values.nsfw == 'on' %}checked{% endif %}>
+  <span>{{ 'composer.nsfw' | t: locale }}</span>
+</label>
+{% if mode == 'new' %}
+<details class="schedule-box">
+  <summary>{{ 'composer.schedule_summary' | t: locale }}</summary>
+  <div class="field">
+    <label for="{{ prefix }}sched">{{ 'composer.schedule_at' | t: locale }}{% if user %} ({{ user.timezone }}){% endif %}</label>
+    <input type="datetime-local" id="{{ prefix }}sched" name="scheduled_at_local">
+  </div>
+  <button type="submit" name="action" value="schedule" class="btn btn-secondary btn-sm">{{ 'composer.schedule' | t: locale }}</button>
+  <button type="submit" name="action" value="queue" class="btn btn-secondary btn-sm">{{ 'composer.queue' | t: locale }}</button>
+</details>
+{% endif %}

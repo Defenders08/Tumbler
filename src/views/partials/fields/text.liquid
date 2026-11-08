@@ -1,0 +1,10 @@
+{% comment %} Поля текстового поста. Параметры: prefix, values, mode. {% endcomment %}
+<div class="field">
+  <label for="{{ prefix }}title">{{ 'composer.title' | t: locale }}</label>
+  <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+</div>
+<div class="field">
+  <label for="{{ prefix }}body">{{ 'composer.body' | t: locale }}</label>
+  <textarea id="{{ prefix }}body" name="body" rows="8" required>{{ values.body }}</textarea>
+  <p class="hint">Markdown</p>
+</div>

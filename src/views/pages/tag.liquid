@@ -1,0 +1,20 @@
+{% layout 'layout' %}
+{% block content %}
+    <div class="page-heading">
+      <h1>#{{ tag }}</h1>
+      <span class="page-sub">{{ total }}</span>
+    </div>
+
+    {% if posts.size == 0 %}
+    {% assign emptyText = 'search.nothing' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+    {% endif %}
+
+    {% for p in posts %}
+    {% include 'partials/post_card', post: p, tz: user.timezone, back: 'dashboard' %}
+    {% endfor %}
+
+    {% assign tagPath = '/tag/' | append: tag %}
+    {% include 'partials/pagination', page: page, pages: pages, basePath: tagPath %}
+  </div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% comment %} Контент поста по типу (текст/фото/цитата/ссылка/аудио/видео/GIF).
+     Используется в карточке поста и во вложении корня реблога. Параметр: post. {% endcomment %}
+{% case post.type %}
+{% when 'text' %}
+  {% if post.title %}<h2 class="post-title">{{ post.title }}</h2>{% endif %}
+  <div class="post-body">{{ post.body_html }}</div>
+{% when 'photo' %}
+  <div class="post-media">
+    {% for m in post.media %}
+    {% if m.kind == 'image' %}
+    <figure class="post-figure">
+      <img src="/media/{{ m.storage_key }}" alt="" loading="lazy"{% if m.width and m.height %} width="{{ m.width }}" height="{{ m.height }}"{% endif %}>
+    </figure>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+{% when 'quote' %}
+  <div class="post-quote">
+    <p class="quote-text">«{{ post.quote_text }}»</p>
+    {% if post.body %}<p class="quote-source">— {{ post.body }}</p>{% endif %}
+  </div>
+{% when 'link' %}
+  <div class="link-card">
+    <span class="link-host">{{ post.link_url }}</span>
+    {% if post.title %}
+    <h2 class="post-title"><a href="{{ post.link_url }}" rel="nofollow noopener">{{ post.title }}</a></h2>
+    {% endif %}
+    {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+  </div>
+{% when 'audio' %}
+  {% assign audioItem = null %}
+  {% assign coverItem = null %}
+  {% for m in post.media %}
+  {% if m.kind == 'audio' %}
+  {% assign audioItem = m %}
+  {% endif %}
+  {% if m.kind == 'cover' %}
+  {% assign coverItem = m %}
+  {% endif %}
+  {% endfor %}
+  <div class="audio-card{% if coverItem %} has-cover{% endif %}">
+    {% if coverItem %}
+    <img class="audio-cover" src="/media/{{ coverItem.storage_key }}" alt="">
+    {% endif %}
+    <div class="audio-main">
+      {% if post.title %}<span class="audio-title">{{ post.title }}</span>{% endif %}
+      {% if audioItem %}
+      <audio controls preload="metadata" src="/media/{{ audioItem.storage_key }}"></audio>
+      {% endif %}
+    </div>
+  </div>
+  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+{% when 'video' %}
+  {% assign videoItem = null %}
+  {% for m in post.media %}
+  {% if m.kind == 'video' %}
+  {% assign videoItem = m %}
+  {% endif %}
+  {% endfor %}
+  {% if videoItem %}
+  <div class="post-media">
+    <figure class="post-figure">
+      <video controls preload="metadata" src="/media/{{ videoItem.storage_key }}"></video>
+    </figure>
+  </div>
+  {% endif %}
+  {% if post.title %}<h2 class="post-title">{{ post.title }}</h2>{% endif %}
+  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+{% when 'gif' %}
+  {% assign gifItem = null %}
+  {% for m in post.media %}
+  {% if m.kind == 'gif' %}
+  {% assign gifItem = m %}
+  {% endif %}
+  {% endfor %}
+  {% if gifItem %}
+  <div class="post-media">
+    <figure class="post-figure gif-figure">
+      <img src="/media/{{ gifItem.storage_key }}" alt=""{% if gifItem.width and gifItem.height %} width="{{ gifItem.width }}" height="{{ gifItem.height }}"{% endif %}>
+      <span class="gif-badge">GIF</span>
+    </figure>
+  </div>
+  {% endif %}
+  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+{% endcase %}

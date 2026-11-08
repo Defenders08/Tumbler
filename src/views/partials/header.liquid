@@ -1,0 +1,69 @@
+{% comment %} Верхняя панель дашборда: градиент 2012, логотип, табы, действия. {% endcomment %}
+<header class="top-bar">
+  <div class="top-bar-inner">
+    <a class="logo" href="/dashboard" aria-label="tumbler">
+      <span class="logo-t">t</span><span class="logo-word">tumbler.</span>
+    </a>
+
+    <nav class="top-tabs">
+      <a href="/dashboard" class="top-tab {% if currentPath == '/dashboard' %}is-active{% endif %}">{{ 'nav.dashboard' | t: locale }}</a>
+      {% if user %}
+      {% assign blogPath = '/' | append: user.blogSlug %}
+      <a href="{{ blogPath }}" class="top-tab {% if currentPath == blogPath %}is-active{% endif %}">{{ 'nav.my_blog' | t: locale }}</a>
+      {% endif %}
+    </nav>
+
+    <form class="top-search" method="get" action="/search" role="search">
+      <input type="search" name="q" value="" maxlength="100" placeholder="{{ 'search.placeholder' | t: locale }}" autocomplete="off">
+    </form>
+
+    <div class="top-actions">
+      <span class="lang-switch">
+        <a href="/set-lang/ru?back={{ currentPath | urlencode }}">RU</a>
+        <span aria-hidden="true">·</span>
+        <a href="/set-lang/en?back={{ currentPath | urlencode }}">EN</a>
+      </span>
+
+      {% if user %}
+      {% if pageClass == 'blog' and blog and isOwner == false %}
+      {% if isFollowing %}{% assign followLabel = 'social.following' %}{% else %}{% assign followLabel = 'social.follow' %}{% endif %}
+      <button type="button" class="btn btn-sm js-follow {% if isFollowing %}btn-secondary{% else %}btn-success{% endif %}"
+              data-slug="{{ blog.slug }}"
+              data-label-follow="{{ 'social.follow' | t: locale }}"
+              data-label-following="{{ 'social.following' | t: locale }}">{{ followLabel | t: locale }}</button>
+      <a class="top-icon" href="/report/blog/{{ blog.id }}?back=/{{ blog.slug }}" title="{{ 'report.title' | t: locale }}">
+        <svg class="icon"><use href="#i-warn"/></svg>
+      </a>
+      {% endif %}
+      {% if unreadNotifications > 0 %}
+      <a class="top-icon has-badge" href="/notifications" title="{{ 'notify.title' | t: locale }}">
+        <svg class="icon"><use href="#i-mail"/></svg><span class="badge">{{ unreadNotifications }}</span>
+      </a>
+      {% endif %}
+      <a class="top-icon {% if currentPath == '/drafts' %}is-active{% endif %}" href="/drafts" title="{{ 'nav.drafts' | t: locale }}">
+        <svg class="icon"><use href="#i-pencil"/></svg>
+      </a>
+      <a class="top-icon {% if currentPath == '/settings/blog' %}is-active{% endif %}" href="/settings/blog" title="{{ 'nav.settings' | t: locale }}">
+        <svg class="icon"><use href="#i-gear"/></svg>
+      </a>
+      <a class="top-avatar" href="/{{ user.blogSlug }}" title="{{ 'nav.my_blog' | t: locale }}">
+        {% if user.avatarKey %}
+        <img src="/media/{{ user.avatarKey }}" alt="">
+        {% else %}
+        <span class="avatar-letter">{{ user.blogSlug | slice: 0 }}</span>
+        {% endif %}
+      </a>
+      <form method="post" action="/logout" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-ghost btn-sm">{{ 'nav.logout' | t: locale }}</button>
+      </form>
+      {% else %}
+      {% if pageClass == 'blog' and blog and blog.ask_enabled %}
+      <a class="btn btn-ghost btn-sm" href="/{{ blog.slug }}/ask">{{ 'ask.title' | t: locale }}</a>
+      {% endif %}
+      <a class="btn btn-secondary btn-sm" href="/login">{{ 'nav.login' | t: locale }}</a>
+      <a class="btn btn-primary btn-sm" href="/register">{{ 'nav.register' | t: locale }}</a>
+      {% endif %}
+    </div>
+  </div>
+</header>

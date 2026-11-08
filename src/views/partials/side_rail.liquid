@@ -1,0 +1,58 @@
+{% comment %} Глобальный правый сайдбар для авторизованных: профиль, навигация, подписки.
+     Данные приходят из globals: ownBlog, draftsCount, subscriptions, subscriptionsCount, newAsks. {% endcomment %}
+<aside class="side-block side-profile">
+  <a class="side-avatar" href="/{{ user.blogSlug }}">
+    {% if user.avatarKey %}
+    <img src="/media/{{ user.avatarKey }}" alt="">
+    {% else %}
+    <span class="avatar-letter">{{ user.blogSlug | slice: 0, 1 }}</span>
+    {% endif %}
+  </a>
+  {% if ownBlog %}
+  <a class="side-title" href="/{{ ownBlog.slug }}">{{ ownBlog.title }}</a>
+  <span class="side-sub">{{ ownBlog.slug }}</span>
+  {% endif %}
+</aside>
+
+<aside class="side-block side-nav">
+  {% if newAsks > 0 %}
+  <a class="side-link" href="/asks">
+    <svg class="icon"><use href="#i-mail"/></svg>
+    <span>{{ 'ask.inbox' | t: locale }}</span>
+    <span class="side-count">{{ newAsks }}</span>
+  </a>
+  {% endif %}
+  <a class="side-link" href="/drafts">
+    <svg class="icon"><use href="#i-pencil"/></svg>
+    <span>{{ 'nav.drafts' | t: locale }}</span>
+    <span class="side-count">{{ draftsCount }}</span>
+  </a>
+  <a class="side-link" href="/settings/blog">
+    <svg class="icon"><use href="#i-gear"/></svg>
+    <span>{{ 'nav.settings' | t: locale }}</span>
+  </a>
+  <a class="side-link" href="/{{ user.blogSlug }}">
+    <svg class="icon"><use href="#i-user"/></svg>
+    <span>{{ 'nav.my_blog' | t: locale }}</span>
+  </a>
+  <a class="side-link" href="/stats">
+    <svg class="icon"><use href="#i-list"/></svg>
+    <span>{{ 'stats.title' | t: locale }}</span>
+  </a>
+</aside>
+
+{% if subscriptions %}
+<aside class="side-block side-follows">
+  <span class="side-heading">{{ 'social.subscriptions' | t: locale }} <span class="side-count">{{ subscriptionsCount }}</span></span>
+  {% for b in subscriptions %}
+  <a class="side-follow" href="/{{ b.slug }}">
+    {% if b.avatar_key %}
+    <img src="/media/{{ b.avatar_key }}" alt="">
+    {% else %}
+    <span class="avatar-letter">{{ b.slug | slice: 0, 1 }}</span>
+    {% endif %}
+    <span class="side-follow-title">{{ b.title }}</span>
+  </a>
+  {% endfor %}
+</aside>
+{% endif %}

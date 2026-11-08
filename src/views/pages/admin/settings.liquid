@@ -1,0 +1,30 @@
+{% layout 'layout' %}
+{% block content %}
+{% include 'partials/admin_nav' %}
+<div class="page-heading"><h1>{{ 'admin.settings' | t: locale }}</h1></div>
+
+{% if saved %}<div class="flash-banner flash-ok" role="status">{{ 'blog.saved' | t: locale }}</div>{% endif %}
+
+<section class="card form-card">
+  <form method="post" action="/admin/settings">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <h2 class="form-section">{{ 'admin.upload_limits' | t: locale }} (МБ)</h2>
+    <div class="field-row">
+      <div class="field"><label>image</label><input type="number" name="image_mb" min="1" max="500" value="{{ limits.image | divided_by: 1048576 }}"></div>
+      <div class="field"><label>gif</label><input type="number" name="gif_mb" min="1" max="500" value="{{ limits.gif | divided_by: 1048576 }}"></div>
+      <div class="field"><label>audio</label><input type="number" name="audio_mb" min="1" max="500" value="{{ limits.audio | divided_by: 1048576 }}"></div>
+      <div class="field"><label>video</label><input type="number" name="video_mb" min="1" max="500" value="{{ limits.video | divided_by: 1048576 }}"></div>
+      <div class="field"><label>{{ 'admin.max_files' | t: locale }}</label><input type="number" name="maxFilesPerPost" min="1" max="10" value="{{ limits.maxFilesPerPost }}"></div>
+    </div>
+    <h2 class="form-section">{{ 'admin.registration' | t: locale }}</h2>
+    <label class="checkbox-field">
+      <input type="checkbox" name="registration_open" {% if registrationOpen %}checked{% endif %}>
+      <span>{{ 'admin.registration_open' | t: locale }}</span>
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+    </div>
+  </form>
+</section>
+</div></div>
+{% endblock %}

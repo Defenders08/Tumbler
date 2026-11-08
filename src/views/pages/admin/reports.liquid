@@ -1,0 +1,43 @@
+{% layout 'layout' %}
+{% block content %}
+{% include 'partials/admin_nav' %}
+<div class="page-heading">
+  <h1>{{ 'admin.reports' | t: locale }}{% if status == 'open' %} ({{ reports.size }}){% endif %}</h1>
+  <span>
+    <a class="btn btn-secondary btn-sm {% if status == 'open' %}is-active{% endif %}" href="/admin/reports?status=open">{{ 'admin.open_reports' | t: locale }}</a>
+    <a class="btn btn-secondary btn-sm" href="/admin/reports?status=resolved">{{ 'admin.resolved' | t: locale }}</a>
+  </span>
+</div>
+
+{% if reports.size == 0 %}<div class="empty-state"><svg class="icon"><use href="#i-warn"/></svg><p>{{ 'admin.reports_empty' | t: locale }}</p></div>{% endif %}
+
+{% for r in reports %}
+<section class="card admin-item">
+  <p><strong>#{{ r.id }}</strong> · {{ r.created_at | date: locale, user.timezone }} · {{ 'admin.reporter' | t: locale }}: {{ r.reporter_email }} · {{ 'report.reason' | t: locale }}: <span class="tag">{{ r.reason }}</span>{% if r.details %} — «{{ r.details }}»{% endif %}</p>
+  {% if r.target %}
+  <p class="hint">{{ 'admin.target' | t: locale }}: {{ r.target_type }} #{{ r.target_id }}{% if r.target.blog_slug %} ({{ r.target.blog_slug }}){% endif %} — «{{ r.target.excerpt }}»{% if r.target.status and r.target.status != 'published' and r.target.status != 'visible' %} [{{ r.target.status }}]{% endif %}</p>
+  {% else %}
+  <p class="hint">{{ 'admin.target_gone' | t: locale }}</p>
+  {% endif %}
+  {% if r.status == 'open' %}
+  <div class="form-actions">
+    {% if r.target %}
+    <form method="post" action="/admin/reports/{{ r.id }}/resolve" class="inline-form">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="action" value="hide_content">
+      <button type="submit" class="btn btn-primary btn-sm">{{ 'admin.hide_content' | t: locale }}</button>
+    </form>
+    {% endif %}
+    <form method="post" action="/admin/reports/{{ r.id }}/resolve" class="inline-form">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="action" value="reject">
+      <button type="submit" class="btn btn-secondary btn-sm">{{ 'admin.reject' | t: locale }}</button>
+    </form>
+  </div>
+  {% else %}
+  <p class="hint">{{ 'admin.resolution' | t: locale }}: {{ r.resolution }}</p>
+  {% endif %}
+</section>
+{% endfor %}
+</div></div>
+{% endblock %}

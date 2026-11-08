@@ -1,0 +1,98 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'blog.settings_title' | t: locale }}</h1>
+    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
+  </div>
+
+  {% if saved %}<div class="flash-banner flash-ok" role="status">{{ 'blog.saved' | t: locale }}</div>{% endif %}
+  {% if avatarSaved %}<div class="flash-banner flash-ok" role="status">{{ 'blog.avatar_saved' | t: locale }}</div>{% endif %}
+  {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
+
+  <section class="card form-card">
+    <form method="post" action="/settings/blog" class="js-theme-form" data-slug="{{ blog.slug }}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="field">
+        <label for="s-title">{{ 'blog.blog_title' | t: locale }}</label>
+        <input type="text" id="s-title" name="title" maxlength="100" value="{{ values.title }}" required>
+      </div>
+      <div class="field">
+        <label for="s-desc">{{ 'blog.description' | t: locale }}</label>
+        <textarea id="s-desc" name="description" rows="3" maxlength="500">{{ values.description }}</textarea>
+      </div>
+
+      <h2 class="form-section">{{ 'blog.timezone_label' | t: locale }}</h2>
+      <div class="field">
+        <select id="s-tz" name="timezone">
+          {% for tz in timezones %}
+          <option value="{{ tz }}" {% if user.timezone == tz %}selected{% endif %}>{{ tz }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <h2 class="form-section">{{ 'ask.title' | t: locale }}</h2>
+      <label class="checkbox-field">
+        <input type="checkbox" name="ask_enabled" {% if blog.ask_enabled %}checked{% endif %}>
+        <span>{{ 'blog.ask_enabled' | t: locale }}</span>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" name="ask_anonymous" {% if blog.ask_anonymous %}checked{% endif %}>
+        <span>{{ 'blog.ask_anonymous' | t: locale }}</span>
+      </label>
+
+      <h2 class="form-section">{{ 'blog.theme' | t: locale }}</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="s-bg">{{ 'blog.bg_color' | t: locale }}</label>
+          <input type="color" id="s-bg" name="bg_color" value="{{ theme.bgColor }}">
+        </div>
+        <div class="field">
+          <label for="s-accent">{{ 'blog.accent_color' | t: locale }}</label>
+          <input type="color" id="s-accent" name="accent_color" value="{{ theme.accentColor }}">
+        </div>
+        <div class="field">
+          <label for="s-text">{{ 'blog.text_color' | t: locale }}</label>
+          <input type="color" id="s-text" name="text_color" value="{{ theme.textColor }}">
+        </div>
+        <div class="field">
+          <label for="s-font">{{ 'blog.font' | t: locale }}</label>
+          <select id="s-font" name="font">
+            <option value="helvetica" {% if theme.font == 'helvetica' %}selected{% endif %}>{{ 'blog.font_helvetica' | t: locale }}</option>
+            <option value="georgia" {% if theme.font == 'georgia' %}selected{% endif %}>{{ 'blog.font_georgia' | t: locale }}</option>
+            <option value="courier" {% if theme.font == 'courier' %}selected{% endif %}>{{ 'blog.font_courier' | t: locale }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" name="action" value="save" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary js-theme-preview" data-slug="{{ blog.slug }}">{{ 'composer.preview' | t: locale }}</button>
+        <button type="submit" formaction="/settings/blog/reset-theme" formmethod="post" class="btn btn-secondary">{{ 'blog.reset_theme' | t: locale }}</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card form-card">
+    <h2 class="form-section">{{ 'blog.avatar' | t: locale }}</h2>
+    <div class="avatar-preview">
+      {% if blog.avatar_key %}
+      <img src="/media/{{ blog.avatar_key }}" alt="">
+      {% else %}
+      <span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span>
+      {% endif %}
+    </div>
+    <form method="post" action="/settings/blog/avatar" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div class="field">
+        <label for="s-avatar">{{ 'composer.file_avatar' | t: locale }}</label>
+        <input type="file" id="s-avatar" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" required>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

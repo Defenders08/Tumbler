@@ -1,0 +1,67 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'queue.title' | t: locale }}</h1>
+    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
+  </div>
+
+  {% if flash %}<div class="flash-banner flash-ok" role="status">{{ flash }}</div>{% endif %}
+
+  {% if total == 0 %}
+    {% assign emptyText = 'queue.empty' | t: locale %}
+    {% assign emptyHintText = 'queue.hint' | t: locale %}
+    {% include 'partials/empty', text: emptyText, hint: emptyHintText %}
+  {% endif %}
+
+  {% if scheduled.size > 0 %}
+  <h2 class="form-section">{{ 'queue.scheduled' | t: locale }}</h2>
+  {% for p in scheduled %}
+  <section class="card queue-item">
+    <header class="post-head">
+      <span class="post-avatar"><span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span></span>
+      <div class="post-byline">
+        <span class="post-blog-name">{{ p.title | default: p.body | default: p.quote_text | truncate: 60 }}</span>
+        <span class="post-meta">{{ 'queue.will_publish' | t: locale }} {{ p.scheduled_at | date: locale, user.timezone }}</span>
+      </div>
+    </header>
+    <div class="form-actions">
+      <form method="post" action="/posts/{{ p.id }}/publish-now" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-primary btn-sm">{{ 'queue.publish_now' | t: locale }}</button>
+      </form>
+      <form method="post" action="/posts/{{ p.id }}/cancel" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-secondary btn-sm">{{ 'queue.cancel' | t: locale }}</button>
+      </form>
+    </div>
+  </section>
+  {% endfor %}
+  {% endif %}
+
+  {% if queued.size > 0 %}
+  <h2 class="form-section">{{ 'queue.queued' | t: locale }} — {{ 'queue.interval_note' | t: locale }}</h2>
+  {% for p in queued %}
+  <section class="card queue-item">
+    <header class="post-head">
+      <span class="post-avatar"><span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span></span>
+      <div class="post-byline">
+        <span class="post-blog-name">{{ p.title | default: p.body | default: p.quote_text | truncate: 60 }}</span>
+        <span class="post-meta">{{ 'queue.queued_at' | t: locale }} {{ p.queued_at | date: locale, user.timezone }}</span>
+      </div>
+    </header>
+    <div class="form-actions">
+      <form method="post" action="/posts/{{ p.id }}/publish-now" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-primary btn-sm">{{ 'queue.publish_now' | t: locale }}</button>
+      </form>
+      <form method="post" action="/posts/{{ p.id }}/cancel" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-secondary btn-sm">{{ 'queue.cancel' | t: locale }}</button>
+      </form>
+    </div>
+  </section>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}

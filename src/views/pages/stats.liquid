@@ -1,0 +1,34 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'stats.title' | t: locale }}</h1>
+    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
+  </div>
+
+  <div class="panel">
+  <div class="admin-stats">
+    <div class="stat"><span class="stat-n">{{ stats.posts }}</span><span>{{ 'search.posts' | t: locale }}</span></div>
+    <div class="stat"><span class="stat-n">{{ stats.views }}</span><span>{{ 'stats.views' | t: locale }}</span></div>
+    <div class="stat"><span class="stat-n">{{ stats.likes }}</span><span>{{ 'social.like' | t: locale }}</span></div>
+    <div class="stat"><span class="stat-n">{{ stats.reblogs }}</span><span>{{ 'social.reblog' | t: locale }}</span></div>
+    <div class="stat"><span class="stat-n">{{ stats.comments }}</span><span>{{ 'social.comments' | t: locale }}</span></div>
+    <div class="stat"><span class="stat-n">{{ stats.followers }}</span><span>{{ 'social.followers_label' | t: locale }}</span></div>
+  </div>
+
+  <h2 class="form-section">{{ 'stats.top_posts' | t: locale }}</h2>
+  {% if topPosts.size == 0 %}
+  <p class="hint">{{ 'stats.empty' | t: locale }}</p>
+  {% endif %}
+  <ul class="log-list">
+    {% for p in topPosts %}
+    <li>
+      <a href="/{{ blog.slug }}/{{ p.id }}">«{{ p.excerpt }}»</a>
+      — {{ p.view_count }} {{ 'stats.views_short' | t: locale }}, {{ p.like_count }} ♥, {{ p.reblog_count }} ↻, {{ p.comment_count }} 💬
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="hint">{{ 'stats.note' | t: locale }}</p>
+  </div>
+</div>
+{% endblock %}

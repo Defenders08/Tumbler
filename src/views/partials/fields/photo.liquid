@@ -1,0 +1,14 @@
+{% comment %} Поля фото-поста. Только статичные изображения; GIF — отдельный тип. {% endcomment %}
+{% if mode == 'new' %}
+<div class="field">
+  <label for="{{ prefix }}media">{{ 'composer.file_photo' | t: locale }}</label>
+  <input type="file" id="{{ prefix }}media" name="media" accept="image/jpeg,image/png,image/webp" multiple required>
+</div>
+{% else %}
+<p class="hint">{{ 'composer.file_note' | t: locale }}</p>
+{% endif %}
+<div class="field">
+  <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
+  <textarea id="{{ prefix }}body" name="body" rows="4">{{ values.body }}</textarea>
+  <p class="hint">Markdown</p>
+</div>

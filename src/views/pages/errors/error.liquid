@@ -1,0 +1,12 @@
+{% layout 'layout' %}
+{% block content %}
+<section class="card error-card">
+      <pre class="ascii-art" aria-hidden="true">  /\_/\
+ ( •.• )  ?
+ /|   |\
+(_|   |_)</pre>
+      <h1>{{ title }}</h1>
+      <p>{{ errorText }}</p>
+      <a class="btn btn-primary" href="/">{{ 'common.home' | t: locale }}</a>
+    </section>
+{% endblock %}

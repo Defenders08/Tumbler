@@ -1,0 +1,33 @@
+{% layout 'layout' %}
+{% block content %}
+{% include 'partials/admin_nav' %}
+<div class="page-heading"><h1>{{ 'admin.posts' | t: locale }}</h1></div>
+
+{% for p in posts %}
+<section class="card admin-item">
+  <p>
+    <strong>#{{ p.id }}</strong> · <span class="tag">{{ p.type }}</span>
+    · <a href="/{{ p.slug }}/{{ p.id }}">{{ p.slug }}</a>
+    · <span class="tag {% if p.status == 'hidden' %}tag-warn{% endif %}">{{ p.status }}</span>
+    · {{ p.created_at | date: locale, user.timezone }}
+  </p>
+  <p class="hint">{{ p.excerpt }}</p>
+  <div class="form-actions">
+    {% if p.status == 'published' %}
+    <form method="post" action="/admin/posts/{{ p.id }}/status" class="inline-form">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="status" value="hidden">
+      <button type="submit" class="btn btn-danger btn-sm">{{ 'admin.hide' | t: locale }}</button>
+    </form>
+    {% else %}
+    <form method="post" action="/admin/posts/{{ p.id }}/status" class="inline-form">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="status" value="published">
+      <button type="submit" class="btn btn-success btn-sm">{{ 'admin.unhide' | t: locale }}</button>
+    </form>
+    {% endif %}
+  </div>
+</section>
+{% endfor %}
+</div></div>
+{% endblock %}

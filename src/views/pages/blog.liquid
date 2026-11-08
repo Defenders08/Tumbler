@@ -1,0 +1,44 @@
+{% layout 'layout' %}
+{% block content %}
+{% if themePreview %}
+<div class="flash-banner flash-info">{{ 'blog.settings_title' | t: locale }} — {{ 'composer.preview' | t: locale }}. <a href="/settings/blog">{{ 'blog.back_to_blog' | t: locale }} → {{ 'nav.settings' | t: locale }}</a></div>
+{% endif %}
+<div class="blog-wrap">
+  <header class="blog-header">
+    <span class="blog-avatar">
+      {% if blog.avatar_key %}
+      <img src="/media/{{ blog.avatar_key }}" alt="">
+      {% else %}
+      <span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span>
+      {% endif %}
+    </span>
+    <h1 class="blog-title">{{ blog.title }}</h1>
+    {% if blog.description %}<p class="blog-description">{{ blog.description }}</p>{% endif %}
+    {% if followers > 0 %}<p class="blog-followers">{{ 'social.followers_label' | t: locale }}: {{ followers }}</p>{% endif %}
+    {% if blog.ask_enabled %}
+    <p class="blog-ask"><a class="btn btn-secondary btn-sm" href="/{{ blog.slug }}/ask">{{ 'ask.title' | t: locale }}</a></p>
+    {% endif %}
+  </header>
+
+  {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
+
+  {% if isOwner %}
+  <div class="owner-strip">
+    <a class="btn btn-secondary btn-sm" href="/settings/blog">{{ 'nav.settings' | t: locale }}</a>
+    <a class="btn btn-secondary btn-sm" href="/dashboard">{{ 'nav.dashboard' | t: locale }}</a>
+  </div>
+  {% endif %}
+
+  {% if posts.size == 0 %}
+    {% assign emptyText = 'blog.empty' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+    {% endif %}
+
+  {% for p in posts %}
+  {% include 'partials/post_card', post: p, tz: 'UTC', back: 'blog' %}
+  {% endfor %}
+
+  {% assign blogBase = '/' | append: blog.slug %}
+  {% include 'partials/pagination', page: page, pages: pages, basePath: blogBase %}
+</div>
+{% endblock %}

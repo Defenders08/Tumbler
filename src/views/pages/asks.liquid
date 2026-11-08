@@ -1,0 +1,53 @@
+{% layout 'layout' %}
+{% block content %}
+<div class="narrow-page">
+  <div class="page-heading">
+    <h1>{{ 'ask.inbox' | t: locale }}{% if newCount > 0 %} ({{ newCount }}){% endif %}</h1>
+    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
+  </div>
+
+  {% if asks.size == 0 %}
+    {% assign emptyText = 'ask.inbox_empty' | t: locale %}
+    {% include 'partials/empty', text: emptyText %}
+    {% endif %}
+
+  {% for a in asks %}
+  <section class="card ask-item {% if a.status == 'answered' %}is-answered{% endif %}">
+    <header class="ask-head">
+      <span class="ask-from">
+        {% if a.is_anonymous %}
+        <span class="avatar-letter anon">?</span>
+        <strong>{{ 'ask.anonymous_short' | t: locale }}</strong>
+        {% elsif a.from_slug %}
+        <a class="comment-avatar" href="/{{ a.from_slug }}">
+          {% if a.from_avatar_key %}<img src="/media/{{ a.from_avatar_key }}" alt="">
+          {% else %}<span class="avatar-letter">{{ a.from_slug | slice: 0, 1 }}</span>{% endif %}
+        </a>
+        <a class="comment-author" href="/{{ a.from_slug }}">{{ a.from_title }}</a>
+        {% else %}
+        <strong>{{ 'ask.anonymous_short' | t: locale }}</strong>
+        {% endif %}
+        <span class="comment-time">{{ a.created_at | date: locale, user.timezone }}</span>
+        {% if a.status == 'answered' %}<span class="tag">{{ 'ask.answered' | t: locale }}</span>{% endif %}
+      </span>
+    </header>
+    <blockquote class="ask-question">{{ a.question }}</blockquote>
+    {% if a.status == 'new' %}
+    <div class="form-actions">
+      <a class="btn btn-primary btn-sm" href="/asks/{{ a.id }}/answer">{{ 'ask.answer' | t: locale }}</a>
+      <form method="post" action="/asks/{{ a.id }}/ignore" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-secondary btn-sm">{{ 'ask.ignore' | t: locale }}</button>
+      </form>
+      <form method="post" action="/asks/{{ a.id }}/delete" class="inline-form js-confirm" data-confirm="{{ 'ask.delete_confirm' | t: locale }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-secondary btn-sm">{{ 'ask.delete' | t: locale }}</button>
+      </form>
+    </div>
+    {% elsif a.answer_post_id %}
+    <p class="hint"><a href="/{{ blog.slug }}/{{ a.answer_post_id }}">{{ 'ask.answer_link' | t: locale }} →</a></p>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

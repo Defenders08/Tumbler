@@ -1,0 +1,222 @@
+{% comment %} Карточка поста любого из 7 типов, включая реблоги.
+     Параметры: post (decorated: media/tags/comments/reblog), tz, back ('dashboard'|'drafts'|'blog').
+     Глобальные: user, locale, csrfToken, nsfwAllowed. {% endcomment %}
+{% assign ownerViewing = false %}
+{% if user and user.id == post.author_user_id %}
+{% assign ownerViewing = true %}
+{% endif %}
+{% assign isDraft = false %}
+{% if post.status == 'draft' %}
+{% assign isDraft = true %}
+{% endif %}
+{% assign nsfwHidden = false %}
+{% if post.nsfw and ownerViewing != true and nsfwAllowed != true %}
+{% assign nsfwHidden = true %}
+{% endif %}
+{% assign backPath = back | default: 'dashboard' %}
+{% if backPath == 'dashboard' %}
+{% assign backUrl = '/dashboard' %}
+{% elsif backPath == 'drafts' %}
+{% assign backUrl = '/drafts' %}
+{% else %}
+{% assign backUrl = '/' | append: post.blog_slug %}
+{% endif %}
+
+<article class="card post-card{% if isDraft %} is-draft{% endif %}" id="post-{{ post.id }}">
+  {% if post.id %}
+  <a class="dogear" href="/{{ post.blog_slug }}/{{ post.id }}" title="{{ 'post.permalink_title' | t: locale }}">
+    <svg class="icon"><use href="#i-dogear"/></svg>
+  </a>
+  {% endif %}
+
+  <header class="post-head">
+    <a class="post-avatar" href="/{{ post.blog_slug }}" aria-hidden="true" tabindex="-1">
+      {% if post.blog_avatar_key %}
+      <img src="/media/{{ post.blog_avatar_key }}" alt="">
+      {% else %}
+      <span class="avatar-letter">{{ post.blog_slug | slice: 0, 1 }}</span>
+      {% endif %}
+    </a>
+    <div class="post-byline">
+      <a class="post-blog-name" href="/{{ post.blog_slug }}">{{ post.blog_title }}</a>
+      {% if post.reblog %}
+      <span class="reblog-note">
+        <svg class="icon"><use href="#i-reblog"/></svg>
+        {% assign r0 = post.reblog.root %}
+        {{ 'social.reblogged_from' | t: locale }} <a href="/{{ r0.blog_slug }}">{{ r0.blog_title }}</a>
+      </span>
+      {% endif %}
+      <span class="post-meta">
+        {{ post.published_at | default: post.updated_at | date: locale, tz }}{% if isDraft %} · <strong>{{ 'post.edited_note' | t: locale }}</strong>{% endif %}
+      </span>
+    </div>
+    {% if ownerViewing and post.id %}
+    <div class="post-manage">
+      <a class="icon-link" href="/posts/{{ post.id }}/edit" title="{{ 'post.edit' | t: locale }}">
+        <svg class="icon"><use href="#i-pencil"/></svg>
+      </a>
+      <form method="post" action="/posts/{{ post.id }}/delete" class="inline-form js-confirm" data-confirm="{{ 'post.delete_confirm' | t: locale }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <input type="hidden" name="back" value="{{ backPath }}">
+        <button type="submit" class="icon-link" title="{{ 'post.delete' | t: locale }}">
+          <svg class="icon"><use href="#i-warn"/></svg>
+        </button>
+      </form>
+    </div>
+    {% elsif user and post.id %}
+    <div class="post-manage">
+      <a class="icon-link icon-link-muted" href="/report/post/{{ post.id }}?back={{ backUrl | urlencode }}" title="{{ 'report.title' | t: locale }}">
+        <svg class="icon"><use href="#i-warn"/></svg>
+      </a>
+    </div>
+    {% endif %}
+  </header>
+
+  {% if nsfwHidden %}
+  <div class="nsfw-placeholder">
+    <svg class="icon icon-big"><use href="#i-warn"/></svg>
+    <p>{{ 'post.nsfw_curtain' | t: locale }}</p>
+    <button type="button" class="btn btn-secondary btn-sm js-nsfw-reveal">{{ 'post.nsfw_show' | t: locale }}</button>
+  </div>
+  {% elsif post.reblog %}
+  <div class="post-content content-font">
+    {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+    {% if post.reblog.parents.size > 0 %}
+    <div class="reblog-trail">
+      {% for a in post.reblog.parents %}
+      <blockquote class="reblog-quote">
+        <a class="rq-author" href="/{{ a.blog_slug }}">{{ a.blog_title }}</a>
+        {% if a.status != 'published' %}
+        <p class="rq-deleted">{{ 'social.reblog_root_deleted' | t: locale }}</p>
+        {% elsif a.body_html %}<div class="post-body">{{ a.body_html }}</div>{% endif %}
+      </blockquote>
+      {% endfor %}
+      {% if post.reblog.more > 0 %}<p class="rq-more">…{{ 'social.trail_more' | t: locale, n: post.reblog.more }}</p>{% endif %}
+    </div>
+    {% endif %}
+    <div class="reblog-root">
+      {% assign r = post.reblog.root %}
+      {% if r.status != 'published' %}
+      <p class="rq-deleted">{{ 'social.reblog_root_deleted' | t: locale }}</p>
+      {% else %}
+      <header class="rr-byline">
+        <a href="/{{ r.blog_slug }}">{{ r.blog_title }}</a>
+        <span class="rr-time">{{ r.published_at | date: locale, tz }}</span>
+      </header>
+      {% include 'partials/post_content', post: r %}
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="post-content content-font">
+    {% include 'partials/post_content', post: post %}
+  </div>
+  {% endif %}
+
+  <footer class="post-foot">
+    {% if post.tags and post.tags.size > 0 %}
+    <div class="post-tags">
+      {% for tag in post.tags %}<a class="tag tag-link" href="/tag/{{ tag }}">#{{ tag }}</a>{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if isDraft == false and post.id %}
+    <div class="post-controls">
+      {% if user %}
+      <button type="button" class="action-btn js-like{% if post.likedByMe %} is-liked{% endif %}" data-post="{{ post.id }}" title="{{ 'social.like' | t: locale }}">
+        <svg class="icon"><use class="js-heart-use" href="#{% if post.likedByMe %}i-heart-fill{% else %}i-heart{% endif %}"/></svg><span class="js-like-count">{{ post.like_count }}</span>
+      </button>
+      <button type="button" class="action-btn js-reblog-toggle" data-post="{{ post.id }}" title="{{ 'social.reblog' | t: locale }}">
+        <svg class="icon"><use href="#i-reblog"/></svg><span>{{ post.reblog_count }}</span>
+      </button>
+      <button type="button" class="action-btn js-comments-toggle" data-post="{{ post.id }}" title="{{ 'social.comments' | t: locale }}">
+        <svg class="icon"><use href="#i-comment"/></svg><span class="js-comment-count">{{ post.comment_count }}</span>
+      </button>
+      <span class="views-stat" title="{{ 'stats.views' | t: locale }}">
+        <svg class="icon"><use href="#i-eye"/></svg><span>{{ post.view_count }}</span>
+      </span>
+      {% else %}
+      <a class="action-btn" href="/login?back={{ backUrl | urlencode }}" title="{{ 'social.login_to_like' | t: locale }}">
+        <svg class="icon"><use href="#i-heart"/></svg><span>{{ post.like_count }}</span>
+      </a>
+      <a class="action-btn" href="/login?back={{ backUrl | urlencode }}" title="{{ 'social.login_to_reblog' | t: locale }}">
+        <svg class="icon"><use href="#i-reblog"/></svg><span>{{ post.reblog_count }}</span>
+      </a>
+      <a class="action-btn" href="/login?back={{ backUrl | urlencode }}" title="{{ 'social.login_to_comment' | t: locale }}">
+        <svg class="icon"><use href="#i-comment"/></svg><span>{{ post.comment_count }}</span>
+      </a>
+      <span class="views-stat" title="{{ 'stats.views' | t: locale }}">
+        <svg class="icon"><use href="#i-eye"/></svg><span>{{ post.view_count }}</span>
+      </span>
+      {% endif %}
+    </div>
+
+
+    {% if user %}
+    <form class="reblog-form js-reblog-form" data-post="{{ post.id }}" method="post" action="/posts/{{ post.id }}/reblog" hidden>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="back" value="{{ backUrl }}">
+      <textarea name="body" rows="3" placeholder="{{ 'social.reblog_placeholder' | t: locale }}"></textarea>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-sm">{{ 'social.reblog_submit' | t: locale }}</button>
+        <button type="button" class="btn btn-secondary btn-sm js-reblog-cancel">{{ 'common.cancel' | t: locale }}</button>
+      </div>
+    </form>
+    {% endif %}
+
+    {% assign showComments = false %}
+    {% if user or post.comments.size > 0 %}
+    {% assign showComments = true %}
+    {% endif %}
+    {% if showComments %}
+    <div class="comments-box js-comments-box" data-post="{{ post.id }}"{% if user %} hidden{% endif %}>
+      {% if post.comments.size > 0 %}
+      <ul class="comments-list">
+        {% for c in post.comments %}
+        <li class="comment">
+          <a class="comment-avatar" href="/{{ c.blog_slug }}">
+            {% if c.avatar_key %}<img src="/media/{{ c.avatar_key }}" alt="">
+            {% else %}<span class="avatar-letter">{{ c.blog_slug | slice: 0, 1 }}</span>{% endif %}
+          </a>
+          <div class="comment-main">
+            <span class="comment-head">
+              <a class="comment-author" href="/{{ c.blog_slug }}">{{ c.blog_title }}</a>
+              <span class="comment-time">{{ c.created_at | date: locale, tz }}</span>
+            </span>
+            <p class="comment-body">{{ c.body }}</p>
+          </div>
+          {% if user and user.id == c.user_id %}
+          <form method="post" action="/comments/{{ c.id }}/delete" class="inline-form js-confirm" data-confirm="{{ 'social.comment_delete_confirm' | t: locale }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="back" value="{{ backUrl }}">
+            <button type="submit" class="icon-link" title="{{ 'social.comment_delete' | t: locale }}">
+              <svg class="icon"><use href="#i-warn"/></svg>
+            </button>
+          </form>
+          {% elsif user %}
+          <a class="icon-link icon-link-muted" href="/report/comment/{{ c.id }}?back={{ backUrl | urlencode }}" title="{{ 'report.title' | t: locale }}">
+            <svg class="icon"><use href="#i-warn"/></svg>
+          </a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% if user %}
+      <form class="comment-form" method="post" action="/posts/{{ post.id }}/comments">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <input type="hidden" name="back" value="{{ backUrl }}">
+        <input type="text" name="body" maxlength="1000" placeholder="{{ 'social.comment_placeholder' | t: locale }}" autocomplete="off" required>
+        <button type="submit" class="btn btn-secondary btn-sm">{{ 'social.comment_submit' | t: locale }}</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% unless user %}
+    <p class="guest-hint">{{ 'social.login_to_act' | t: locale }} <a href="/login?back={{ backUrl | urlencode }}">{{ 'nav.login' | t: locale }}</a></p>
+    {% endunless %}
+
+    {% endif %}
+  </footer>
+</article>
