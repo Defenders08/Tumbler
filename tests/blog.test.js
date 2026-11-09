@@ -43,84 +43,33 @@ test('настройки блога: профиль и тема сохраняю
       _csrf: agent.csrf,
       title: 'Новое название',
       description: 'Моё описание',
-      bg_color: '#101010',
-      accent_color: '#ff0000',
-      text_color: '#eeeeee',
-      font: 'georgia',
     });
     assert.equal(save.status, 303);
 
     const blog = t.ctx.db.prepare('SELECT * FROM blogs WHERE slug = ?').get('marta');
     assert.equal(blog.title, 'Новое название');
     assert.equal(blog.description, 'Моё описание');
-    const theme = JSON.parse(blog.theme);
-    assert.equal(theme.bgColor, '#101010');
-    assert.equal(theme.font, 'georgia');
 
-    // Гость видит обновлённое название и инлайновую тему
+    // Гость видит обновлённое название
     const guest = await createAgent(t.base);
     const page = await guest.get('/marta');
     assert.match(page.html, /Новое название/);
-    assert.match(page.html, /#101010/);
   } finally {
     await t.close();
   }
 });
 
-test('некорректные цвета темы заменяются стандартными, а не ломают страницу', async () => {
+test('тематическое оформление убрано: блоги на канве дашборда', async () => {
   const t = await createTestApp();
   try {
     const { agent } = await registerAgent(t.base, { email: 'a@example.com', password: 'parol-1234', slug: 'marta' });
-    await agent.postForm('/settings/blog', {
-      _csrf: agent.csrf,
-      title: 'T',
-      description: '',
-      bg_color: 'javascript:alert(1)',
-      accent_color: '#zzzzzz',
-      text_color: '#444444',
-      font: 'comic-sans',
-    });
-    const theme = JSON.parse(t.ctx.db.prepare('SELECT theme FROM blogs WHERE slug = ?').get('marta').theme);
-    assert.ok(/^#[0-9a-f]{6}$/.test(theme.bgColor));
-    assert.ok(/^#[0-9a-f]{6}$/.test(theme.accentColor));
-    assert.equal(theme.font, 'helvetica');
-  } finally {
-    await t.close();
-  }
-});
+    const settings = await agent.get('/settings/blog');
+    assert.doesNotMatch(settings.html, /Цвет фона|bg_color/, 'контролы темы удалены из настроек');
 
-test('предпросмотр темы (tp) работает только для владельца', async () => {
-  const t = await createTestApp();
-  try {
-    const { agent } = await registerAgent(t.base, { email: 'a@example.com', password: 'parol-1234', slug: 'marta' });
-    const tp = encodeURIComponent(JSON.stringify({ bgColor: '#123456', accentColor: '#abcdef', textColor: '#ffffff', font: 'courier' }));
-
-    const ownerPage = await agent.get(`/marta?tp=${tp}`);
-    assert.match(ownerPage.html, /#123456/);
-
-    const guest = await createAgent(t.base);
-    const guestPage = await guest.get(`/marta?tp=${tp}`);
-    assert.doesNotMatch(guestPage.html, /#123456/, 'гостю предпросмотр не показывается');
-  } finally {
-    await t.close();
-  }
-});
-
-test('сброс темы возвращает стандартную', async () => {
-  const t = await createTestApp();
-  try {
-    const { agent } = await registerAgent(t.base, { email: 'a@example.com', password: 'parol-1234', slug: 'marta' });
-    await agent.postForm('/settings/blog', {
-      _csrf: agent.csrf,
-      title: 'T', description: '', bg_color: '#101010', accent_color: '#ff0000', text_color: '#eeeeee', font: 'georgia',
-    });
-    const reset = await agent.postForm('/settings/blog/reset-theme', { _csrf: agent.csrf });
-    assert.equal(reset.status, 303);
-    // Сброс — пустой JSON в базе; parseTheme подставит стандартные значения при рендере.
-    assert.equal(t.ctx.db.prepare('SELECT theme FROM blogs WHERE slug = ?').get('marta').theme, '{}');
     const guest = await createAgent(t.base);
     const page = await guest.get('/marta');
-    assert.match(page.html, /#f2f4f7/);
+    assert.doesNotMatch(page.html, /blog-surface/, 'страница блога на канве дашборда');
+    assert.match(page.html, /blog-identity/, 'идентичность блога — карточка');
   } finally {
     await t.close();
   }

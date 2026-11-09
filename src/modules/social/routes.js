@@ -2,7 +2,7 @@
 // JSON API (лайк/подписка) — для fetch с заголовком x-csrf-token;
 // формы (реблог, комментарии) — классический POST с PRG-редиректом.
 import { Router } from 'express';
-import { toggleFollow, toggleLike, addComment, deleteComment, isFollowing, followerCount } from './service.js';
+import { toggleFollow, toggleLike, addComment, deleteComment, isFollowing, followerCount, toggleTagFollow, toggleCommentLike } from './service.js';
 import { createReblog, getPostById, FormError } from '../posts/service.js';
 import { SocialError } from './service.js';
 import { getBlogBySlug, getBlogByUserId } from '../blogs/service.js';
@@ -35,6 +35,32 @@ export function socialApiRoutes(ctx, csrf) {
       const result = toggleLike(ctx.db, req.user.id, id);
       const count = ctx.db.prepare('SELECT like_count FROM posts WHERE id = ?').get(id)?.like_count ?? 0;
       res.json({ liked: result.liked, likeCount: count });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Лайк (toggle) комментария.
+  router.post('/api/comments/:id/like', csrf.protection, (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id)) throw new SocialError('social.comment_not_found', { status: 404 });
+      const result = toggleCommentLike(ctx.db, req.user.id, id);
+      const count = ctx.db.prepare('SELECT like_count FROM comments WHERE id = ?').get(id)?.like_count ?? 0;
+      res.json({ liked: result.liked, likeCount: count });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Подписка (toggle) на тег по имени.
+  router.post('/api/tags/:name/follow', csrf.protection, (req, res, next) => {
+    try {
+      const name = String(req.params.name ?? '').trim().toLowerCase().slice(0, 30);
+      const tag = ctx.db.prepare('SELECT id FROM tags WHERE name = ?').get(name);
+      if (!tag) throw new SocialError('social.post_not_published', { status: 404 });
+      const result = toggleTagFollow(ctx.db, req.user.id, tag.id);
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -89,7 +115,8 @@ export function socialFormRoutes(ctx, csrf) {
   router.post('/posts/:id/comments', csrf.protection, (req, res, next) => {
     try {
       const id = Number(req.params.id);
-      addComment(ctx.db, id, req.user.id, req.body.body);
+      const parentId = req.body.parent_id ? Number(req.body.parent_id) : null;
+      addComment(ctx.db, id, req.user.id, req.body.body, parentId);
       res.redirect(303, safeBack(req.body.back) + '#post-' + id);
     } catch (err) {
       if (err instanceof SocialError && err.status === 422) {

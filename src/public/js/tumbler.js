@@ -164,3 +164,51 @@
       if (box) box.hidden = !box.hidden;
     });
   });
+
+  // --- Комментарии 2.0: лайки и ответы ---
+  document.querySelectorAll('.js-comment-like').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (btn.classList.contains('is-busy')) return;
+      btn.classList.add('is-busy');
+      try {
+        const res = await fetch('/api/comments/' + btn.dataset.comment + '/like', {
+          method: 'POST',
+          headers: { 'x-csrf-token': apiToken },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        btn.classList.toggle('is-liked', data.liked);
+        const use = btn.querySelector('.js-comment-heart');
+        if (use) use.setAttribute('href', data.liked ? '#i-heart-fill' : '#i-heart');
+        const count = btn.querySelector('.js-like-count');
+        if (count) count.textContent = data.likeCount;
+      } finally {
+        btn.classList.remove('is-busy');
+      }
+    });
+  });
+
+  // Ответ на комментарий: parent_id + подсказка «→ Автор», отмена возвращает обычный режим.
+  document.querySelectorAll('.js-reply').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.comments-box');
+      const form = card && card.querySelector('.js-comment-form');
+      if (!form) return;
+      form.querySelector('.js-parent-id').value = btn.dataset.comment;
+      const hint = document.createElement('span');
+      hint.className = 'reply-hint';
+      hint.textContent = '→ ' + (btn.dataset.author || '');
+      form.querySelector('input[type="text"]').placeholder = hint.textContent;
+      const cancel = form.querySelector('.js-reply-cancel');
+      cancel.hidden = false;
+      cancel.onclick = () => {
+        form.querySelector('.js-parent-id').value = '';
+        form.querySelector('input[type="text"]').placeholder = form.querySelector('input[type="text"]').dataset.placeholder || 'Ваш комментарий…';
+        cancel.hidden = true;
+      };
+      const input = form.querySelector('input[type="text"]');
+      input.dataset.placeholder = input.dataset.placeholder || input.placeholder;
+      input.placeholder = '→ ' + (btn.dataset.author || '') + ': ваш ответ…';
+      input.focus();
+    });
+  });

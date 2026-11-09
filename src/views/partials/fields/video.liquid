@@ -2,7 +2,12 @@
 {% if mode == 'new' %}
 <div class="field">
   <label for="{{ prefix }}file">{{ 'composer.file_video' | t: locale }}</label>
-  <input type="file" id="{{ prefix }}file" name="file" accept="video/mp4,video/webm,.mp4,.webm" required>
+  <input type="file" id="{{ prefix }}file" name="file" accept="video/mp4,video/webm,.mp4,.webm">
+</div>
+<div class="field">
+  <label for="{{ prefix }}link">{{ 'composer.link_or_file' | t: locale }}</label>
+  <input type="url" id="{{ prefix }}link" name="link_url" placeholder="https://youtube.com/watch?v=..." value="{{ values.link_url }}">
+  <p class="hint">{{ 'composer.link_hint_yt' | t: locale }}</p>
 </div>
 {% else %}
 <p class="hint">{{ 'composer.file_note' | t: locale }}</p>

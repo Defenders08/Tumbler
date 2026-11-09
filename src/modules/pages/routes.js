@@ -2,15 +2,14 @@
 import { Router } from 'express';
 import { requireAuth } from '../auth/session.js';
 import { getBlogView } from '../blogs/service.js';
-import { validateTheme } from '../blogs/theme.js';
 import { viewerFollows } from '../social/routes.js';
-import { followerCount, followedCount, followedBlogs } from '../social/service.js';
+import { followerCount, followedCount, followedBlogs, isFollowing } from '../social/service.js';
 import { listBlogPosts, decoratePosts, getPostById } from '../posts/service.js';
 import { translate as t9 } from '../../lib/i18n.js';
 import { renderDashboardPage } from './dashboard.js';
 import { translate } from '../../lib/i18n.js';
 import { recordView } from '../api/stats.js';
-import { blogStats, topPostsByViews } from '../api/stats.js';
+import { blogStats, topPostsByViews, viewsSeries, likesSeries, svgChart } from '../api/stats.js';
 
 const SLUG_RE = /^[a-z0-9-]{3,32}$/;
 
@@ -35,6 +34,9 @@ export function pagesRoutes(ctx) {
         blog,
         stats: blogStats(ctx.db, blog.id),
         topPosts: topPostsByViews(ctx.db, blog.id, 5),
+        viewsChart: svgChart(viewsSeries(ctx.db, blog.id, 30), { color: '#5791bb' }),
+        likesChart: svgChart(likesSeries(ctx.db, blog.id, 30), { color: '#d95e40' }),
+        days: 30,
       });
     } catch (err) {
       next(err);
@@ -112,20 +114,12 @@ export function pagesRoutes(ctx) {
       const isFollowing = viewerFollows(ctx, req, blogView);
       const followers = followerCount(ctx.db, blogView.id);
 
-      // Предпросмотр темы из настроек: только владелец, параметры строго валидируются.
-      let theme = blogView.theme;
-      let themePreview = false;
-      if (isOwner && typeof req.query.tp === 'string') {
-        try {
-          theme = validateTheme(JSON.parse(req.query.tp));
-          themePreview = true;
-        } catch {
-          // некорректный параметр предпросмотра игнорируем
-        }
-      }
-
       const page = Math.max(1, Number.parseInt(String(req.query.page ?? '1'), 10) || 1);
-      const { rows, total, pages } = listBlogPosts(ctx.db, blogView.id, 'published', { page, perPage: 10 });
+      // Приватные посты видят владелец, подписчики и модераторы/админы.
+      const canSeePrivate = isOwner
+        || isFollowing
+        || (req.user && ['moderator', 'admin'].includes(req.user.role));
+      const { rows, total, pages } = listBlogPosts(ctx.db, blogView.id, 'published', { page, perPage: 10, includePrivate: canSeePrivate });
       const posts = decoratePosts(ctx.db, rows, req.user ? { userId: req.user.id } : null);
       const commentError = typeof req.query.commentError === 'string'
         ? translate(req.lang, req.query.commentError)
@@ -134,8 +128,7 @@ export function pagesRoutes(ctx) {
         pageClass: 'blog',
         title: blogView.title,
         blog: blogView,
-        theme,
-        themePreview,
+        theme: blogView.theme,
         posts,
         page,
         pages,
@@ -164,6 +157,19 @@ export function pagesRoutes(ctx) {
         });
       }
       const isOwner = Boolean(req.user && req.user.id === blogView.user_id);
+      // Приватный пост: владелец, подписчики блога, модерация.
+      if (post.visibility === 'private') {
+        const following = req.user ? isFollowing(ctx.db, req.user.id, blogView.user_id) : false;
+        const canSee = isOwner
+          || following
+          || (req.user && ['moderator', 'admin'].includes(req.user.role));
+        if (!canSee) {
+          return res.status(404).render('pages/errors/error', {
+            title: translate(req.lang, 'errors.404_title'),
+            errorText: translate(req.lang, 'errors.404_text'),
+          });
+        }
+      }
       if (post.status !== 'published' && !isOwner) {
         return res.status(404).render('pages/errors/error', {
           title: translate(req.lang, 'errors.404_title'),
@@ -182,7 +188,7 @@ export function pagesRoutes(ctx) {
         title: blogView.title,
         blog: blogView,
         theme: blogView.theme,
-        themePreview: false,
+
         post: decorated,
         commentError: typeof req.query.commentError === 'string'
           ? translate(req.lang, req.query.commentError)

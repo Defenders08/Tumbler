@@ -1,8 +1,8 @@
 {% layout 'layout' %}
 {% block content %}
-<div class="blog-wrap">
-  <header class="blog-header">
-    <span class="blog-avatar">
+<div class="feed">
+  <section class="card blog-identity">
+    <span class="blog-avatar blog-avatar-sm">
       {% if blog.avatar_key %}
       <img src="/media/{{ blog.avatar_key }}" alt="">
       {% else %}
@@ -10,10 +10,11 @@
       {% endif %}
     </span>
     <h1 class="blog-title"><a href="/{{ blog.slug }}">{{ blog.title }}</a></h1>
-  </header>
+  </section>
+
+  {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
 
   <p class="permalink-note"><a href="/{{ blog.slug }}">← {{ 'blog.back_to_blog' | t: locale }}</a></p>
-  {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
 
   {% include 'partials/post_card', post: post, tz: 'UTC', back: 'blog' %}
 </div>

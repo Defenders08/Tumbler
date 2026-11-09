@@ -2,7 +2,12 @@
 {% if mode == 'new' %}
 <div class="field">
   <label for="{{ prefix }}file">{{ 'composer.file_audio' | t: locale }}</label>
-  <input type="file" id="{{ prefix }}file" name="file" accept="audio/mpeg,audio/mp4,audio/ogg,.mp3,.m4a,.ogg" required>
+  <input type="file" id="{{ prefix }}file" name="file" accept="audio/mpeg,audio/mp4,audio/ogg,.mp3,.m4a,.ogg">
+</div>
+<div class="field">
+  <label for="{{ prefix }}link">{{ 'composer.link_or_file' | t: locale }}</label>
+  <input type="url" id="{{ prefix }}link" name="link_url" placeholder="https://soundcloud.com/..." value="{{ values.link_url }}">
+  <p class="hint">{{ 'composer.link_hint_sc' | t: locale }}</p>
 </div>
 <div class="field">
   <label for="{{ prefix }}cover">{{ 'composer.file_avatar' | t: locale }}</label>

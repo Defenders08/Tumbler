@@ -7,21 +7,11 @@
   <link rel="stylesheet" href="/static/css/tumbler.css">
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   {% if csrfToken %}<meta name="csrf-token" content="{{ csrfToken }}">{% endif %}
-  {% if theme %}
-  {% comment %} Тема публичного блога: значения уже валидированы (hex-цвета, шрифт из списка). {% endcomment %}
-  <style>
-    body.blog-surface { background: {{ theme.bgColor }}; color: {{ theme.textColor }}; }
-    body.blog-surface a { color: {{ theme.accentColor }}; }
-    body.blog-surface .blog-header .muted, body.blog-surface .post-meta { color: {{ theme.textColor }}; opacity: .7; }
-    {% if theme.font == 'georgia' %}
-    body.blog-surface .content-font { font-family: Georgia, 'Times New Roman', serif; }
-    {% elsif theme.font == 'courier' %}
-    body.blog-surface .content-font { font-family: 'Courier New', Courier, monospace; }
-    {% endif %}
-  </style>
+  {% if theme and theme.accentColor %}
+  <style>.blog-identity { --blog-accent: {{ theme.accentColor }}; } .blog-identity .blog-title a, .blog-identity .blog-ask a { color: var(--blog-accent, {{ theme.accentColor }}); }</style>
   {% endif %}
 </head>
-<body class="{{ pageClass | default: 'dash' }}-page{% if pageClass == 'blog' %} blog-surface{% endif %}">
+<body class="{{ pageClass | default: 'dash' }}-page">
   {% include 'partials/icons' %}
   {% include 'partials/header' %}
 
@@ -54,6 +44,8 @@
   </nav>
   {% endif %}
 
+  <script src="/static/vendor/turndown.js"></script>
   <script src="/static/js/tumbler.js" defer></script>
+  <script src="/static/js/wysiwyg.js" defer></script>
 </body>
 </html>

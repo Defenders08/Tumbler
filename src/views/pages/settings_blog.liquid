@@ -11,7 +11,7 @@
   {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
 
   <section class="card form-card">
-    <form method="post" action="/settings/blog" class="js-theme-form" data-slug="{{ blog.slug }}">
+    <form method="post" action="/settings/blog">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
       <div class="field">
@@ -32,6 +32,13 @@
         </select>
       </div>
 
+      <h2 class="form-section">{{ 'blog.look_title' | t: locale }}</h2>
+      <div class="field">
+        <label for="s-accent">{{ 'blog.accent_color' | t: locale }}</label>
+        <input type="color" id="s-accent" name="accent_color" value="{{ theme.accentColor }}">
+        <p class="hint">{{ 'blog.accent_hint' | t: locale }}</p>
+      </div>
+
       <h2 class="form-section">{{ 'ask.title' | t: locale }}</h2>
       <label class="checkbox-field">
         <input type="checkbox" name="ask_enabled" {% if blog.ask_enabled %}checked{% endif %}>
@@ -42,34 +49,8 @@
         <span>{{ 'blog.ask_anonymous' | t: locale }}</span>
       </label>
 
-      <h2 class="form-section">{{ 'blog.theme' | t: locale }}</h2>
-      <div class="field-row">
-        <div class="field">
-          <label for="s-bg">{{ 'blog.bg_color' | t: locale }}</label>
-          <input type="color" id="s-bg" name="bg_color" value="{{ theme.bgColor }}">
-        </div>
-        <div class="field">
-          <label for="s-accent">{{ 'blog.accent_color' | t: locale }}</label>
-          <input type="color" id="s-accent" name="accent_color" value="{{ theme.accentColor }}">
-        </div>
-        <div class="field">
-          <label for="s-text">{{ 'blog.text_color' | t: locale }}</label>
-          <input type="color" id="s-text" name="text_color" value="{{ theme.textColor }}">
-        </div>
-        <div class="field">
-          <label for="s-font">{{ 'blog.font' | t: locale }}</label>
-          <select id="s-font" name="font">
-            <option value="helvetica" {% if theme.font == 'helvetica' %}selected{% endif %}>{{ 'blog.font_helvetica' | t: locale }}</option>
-            <option value="georgia" {% if theme.font == 'georgia' %}selected{% endif %}>{{ 'blog.font_georgia' | t: locale }}</option>
-            <option value="courier" {% if theme.font == 'courier' %}selected{% endif %}>{{ 'blog.font_courier' | t: locale }}</option>
-          </select>
-        </div>
-      </div>
-
       <div class="form-actions">
         <button type="submit" name="action" value="save" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
-        <button type="button" class="btn btn-secondary js-theme-preview" data-slug="{{ blog.slug }}">{{ 'composer.preview' | t: locale }}</button>
-        <button type="submit" formaction="/settings/blog/reset-theme" formmethod="post" class="btn btn-secondary">{{ 'blog.reset_theme' | t: locale }}</button>
       </div>
     </form>
   </section>
@@ -88,6 +69,25 @@
       <div class="field">
         <label for="s-avatar">{{ 'composer.file_avatar' | t: locale }}</label>
         <input type="file" id="s-avatar" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" required>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+      </div>
+    </form>
+
+    <h2 class="form-section">{{ 'blog.banner' | t: locale }}</h2>
+    {% if theme.bannerKey %}
+    <div class="banner-preview"><img src="/media/{{ theme.bannerKey }}" alt=""></div>
+    <form method="post" action="/settings/blog/banner/remove" class="inline-form js-confirm" data-confirm="{{ 'blog.banner_remove_confirm' | t: locale }}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn btn-secondary btn-sm">{{ 'blog.banner_remove' | t: locale }}</button>
+    </form>
+    {% endif %}
+    <form method="post" action="/settings/blog/banner" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div class="field">
+        <label for="s-banner">{{ 'blog.banner_upload' | t: locale }}</label>
+        <input type="file" id="s-banner" name="banner" accept="image/jpeg,image/png,image/webp,image/gif" {% if theme.bannerKey == null %}required{% endif %}>
       </div>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>

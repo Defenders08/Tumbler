@@ -101,9 +101,16 @@
       "too_large_video": "The video exceeds the size limit.",
       "bad_media": "The file is unreadable or corrupted.",
       "too_long": "Text is too long.",
-      "bad_schedule": "Pick a future date and time for publishing."
+      "bad_schedule": "Pick a future date and time for publishing.",
+      "bad_embed": "Only YouTube, Vimeo or SoundCloud links are supported.",
+      "required_file_or_link": "Attach a file or paste a link.",
+      "file_or_link_not_both": "Choose one: a file or a link."
     },
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "private": "Followers only",
+    "link_or_file": "Or a track link",
+    "link_hint_sc": "SoundCloud — paste a track link",
+    "link_hint_yt": "YouTube or Vimeo — paste a video link"
   },
   "blog": {
     "settings_title": "Blog settings",
@@ -128,7 +135,13 @@
     "empty": "Nothing here yet.",
     "permalink": "Post",
     "back_to_blog": "Back to blog",
-    "timezone_label": "Time zone (for scheduling and display)"
+    "timezone_label": "Time zone (for scheduling and display)",
+    "look_title": "Look",
+    "accent_hint": "Colors the title and ask button on your blog page",
+    "banner": "Header banner",
+    "banner_upload": "Banner image (wide, cropped to 140px height)",
+    "banner_remove": "Remove banner",
+    "banner_remove_confirm": "Remove the banner?"
   },
   "drafts": {
     "title": "Drafts",
@@ -144,7 +157,10 @@
     "nsfw_curtain": "Sensitive content 18+",
     "nsfw_show": "Show",
     "activity_zero": "No likes, reblogs or comments yet",
-    "permalink_title": "Permalink"
+    "permalink_title": "Permalink",
+    "pin": "Pin to blog",
+    "unpin": "Unpin",
+    "pinned": "Pinned"
   },
   "errors": {
     "404_title": "Page not found",
@@ -318,6 +334,11 @@
     "views_short": "views",
     "top_posts": "Most viewed posts",
     "empty": "No posts yet.",
-    "note": "Views are counted on post pages; one visit per visitor per day counts once."
+    "note": "Views are counted on post pages; one visit per visitor per day counts once.",
+    "chart_views": "Views per day",
+    "chart_likes": "Likes per day"
+  },
+  "tags": {
+    "mine": "My tags"
   }
 }

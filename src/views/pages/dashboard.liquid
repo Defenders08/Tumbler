@@ -1,5 +1,6 @@
 {% layout 'layout' %}
 {% block content %}
+<div class="feed">
     {% include 'partials/composer', blog: blog, composerError: composerError, composerErrorNote: composerErrorNote, openType: openType, values: values %}
 
     {% if flash %}<div class="flash-banner flash-ok" role="status">{{ flash }}</div>{% endif %}
@@ -15,4 +16,5 @@
     {% endfor %}
 
     {% include 'partials/pagination', page: page, pages: pages, basePath: '/dashboard' %}
+</div>
 {% endblock %}

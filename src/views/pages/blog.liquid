@@ -3,8 +3,16 @@
 {% if themePreview %}
 <div class="flash-banner flash-info">{{ 'blog.settings_title' | t: locale }} — {{ 'composer.preview' | t: locale }}. <a href="/settings/blog">{{ 'blog.back_to_blog' | t: locale }} → {{ 'nav.settings' | t: locale }}</a></div>
 {% endif %}
-<div class="blog-wrap">
-  <header class="blog-header">
+<div class="feed">
+  {% if themePreview %}
+  <div class="flash-banner flash-info">{{ 'blog.settings_title' | t: locale }} — {{ 'composer.preview' | t: locale }}. <a href="/settings/blog">{{ 'blog.back_to_blog' | t: locale }} → {{ 'nav.settings' | t: locale }}</a></div>
+  {% endif %}
+  {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
+
+  <section class="card blog-identity"{% if theme.accentColor %} style="--blog-accent: {{ theme.accentColor }}"{% endif %}>
+    {% if theme.bannerKey %}
+    <div class="blog-banner"><img src="/media/{{ theme.bannerKey }}" alt=""></div>
+    {% endif %}
     <span class="blog-avatar">
       {% if blog.avatar_key %}
       <img src="/media/{{ blog.avatar_key }}" alt="">
@@ -18,16 +26,13 @@
     {% if blog.ask_enabled %}
     <p class="blog-ask"><a class="btn btn-secondary btn-sm" href="/{{ blog.slug }}/ask">{{ 'ask.title' | t: locale }}</a></p>
     {% endif %}
-  </header>
-
-  {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
-
-  {% if isOwner %}
-  <div class="owner-strip">
-    <a class="btn btn-secondary btn-sm" href="/settings/blog">{{ 'nav.settings' | t: locale }}</a>
-    <a class="btn btn-secondary btn-sm" href="/dashboard">{{ 'nav.dashboard' | t: locale }}</a>
-  </div>
-  {% endif %}
+    {% if isOwner %}
+    <div class="owner-strip">
+      <a class="btn btn-secondary btn-sm" href="/settings/blog">{{ 'nav.settings' | t: locale }}</a>
+      <a class="btn btn-secondary btn-sm" href="/dashboard">{{ 'nav.dashboard' | t: locale }}</a>
+    </div>
+    {% endif %}
+  </section>
 
   {% if posts.size == 0 %}
     {% assign emptyText = 'blog.empty' | t: locale %}

@@ -7,6 +7,10 @@
   <input type="checkbox" name="nsfw" {% if values.nsfw == 'on' %}checked{% endif %}>
   <span>{{ 'composer.nsfw' | t: locale }}</span>
 </label>
+<label class="checkbox-field">
+  <input type="checkbox" name="visibility" value="private" {% if values.visibility == 'private' %}checked{% endif %}>
+  <span>{{ 'composer.private' | t: locale }}</span>
+</label>
 {% if mode == 'new' %}
 <details class="schedule-box">
   <summary>{{ 'composer.schedule_summary' | t: locale }}</summary>

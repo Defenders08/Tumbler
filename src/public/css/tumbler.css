@@ -234,17 +234,18 @@ h1, h2, h3 { color: var(--c-ink-strong); margin: 0 0 8px; }
   max-width: var(--w-container);
   margin: 0 auto;
   display: flex;
+  justify-content: center;
   gap: 20px;
   align-items: flex-start;
   padding: 20px 10px 40px;
 }
-.app-main { flex: 1; min-width: 0; padding: 0; }
+.app-main { width: var(--w-feed); max-width: 100%; padding: 0; }
 .app-sidebar {
   width: var(--w-sidebar);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   color: #fff;
 }
 
@@ -255,10 +256,10 @@ h1, h2, h3 { color: var(--c-ink-strong); margin: 0 0 8px; }
   gap: 20px;
   align-items: flex-start;
 }
-.feed { width: 100%; display: flex; flex-direction: column; gap: 18px; }
+.feed { width: 100%; display: flex; flex-direction: column; gap: 24px; }
 .sidebar { width: var(--w-sidebar); color: #fff; display: flex; flex-direction: column; gap: 12px; }
 
-.narrow-page { max-width: 560px; margin: 0 auto; }
+.narrow-page { width: 100%; margin: 0 auto; }
 .page-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .page-heading h1 { color: #fff; font-size: 20px; margin: 0; }
 
@@ -602,30 +603,30 @@ body.dash-page .app-main .page-heading h1 { color: #fff; }
 body.blog-surface .top-bar-inner { max-width: 1080px; } /* на странице блога больше действий в шапке */
 .blog-wrap .page-main-offset { margin-top: 20px; }
 
-.blog-header { text-align: center; padding: 10px 0 6px; }
+.blog-identity { text-align: center; padding: 22px 22px 18px; }
 .blog-avatar {
-  width: 128px;
-  height: 128px;
+  width: 112px;
+  height: 112px;
   border-radius: var(--radius-avatar);
   background: var(--c-avatar-well);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-soft);
 }
 .blog-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.blog-avatar .avatar-letter { font-size: 56px; }
-.blog-title { font-size: 26px; margin: 14px 0 4px; }
-.blog-title a { color: inherit; }
-.blog-description { margin: 0; opacity: 0.85; }
+.blog-avatar .avatar-letter { font-size: 48px; }
+.blog-avatar-sm { width: 64px; height: 64px; }
+.blog-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.blog-avatar-sm .avatar-letter { font-size: 24px; }
+.blog-title { font-size: 22px; margin: 12px 0 4px; }
+.blog-title a { color: var(--c-ink-strong); }
+.blog-description { margin: 0 0 6px; color: var(--c-ink); }
+.blog-followers { font: 12px/1.4 var(--font-ui); color: var(--c-ink-muted); margin: 4px 0 0; }
+.blog-ask { margin: 10px 0 4px; }
 
-.owner-strip { display: flex; gap: 8px; justify-content: center; }
+.owner-strip { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
 .permalink-note { text-align: center; margin: 0; }
-
-/* Светлый фон страницы блога — тема применяется инлайном из layout */
-body.blog-surface { background: var(--c-bg); }
-body.blog-surface .blog-bar { background: var(--c-header); }
 
 /* ---------- Аутентификация, настройки, ошибки ---------- */
 
@@ -673,16 +674,7 @@ body.blog-surface .blog-bar { background: var(--c-header); }
 /* Пустое состояние внутри подложки секции — без собственного фона */
 .panel .empty-state { background: transparent; padding: 12px 0 0; }
 
-body.blog-surface .empty-state { background: rgba(0, 0, 0, 0.05); color: inherit; }
 
-/* Сайдбар на светлом фоне блога: тёмно-синие блоки с белым текстом (в духе Redux) */
-body.blog-surface .app-sidebar { color: #fff; }
-body.blog-surface .side-block { background: var(--c-bg); }
-body.blog-surface .side-link, body.blog-surface .side-follow { color: var(--c-link-nav); }
-body.blog-surface .side-link:hover, body.blog-surface .side-follow:hover { color: #fff; }
-body.blog-surface .side-title { color: #fff; }
-body.blog-surface .side-sub { color: var(--c-link-nav); }
-body.blog-surface .side-heading { color: var(--c-link-nav); }
 
 .pagination {
   display: flex;
@@ -693,7 +685,6 @@ body.blog-surface .side-heading { color: var(--c-link-nav); }
   font-size: 13px;
 }
 .page-link { color: var(--c-link-nav); }
-body.blog-surface .page-link { color: inherit; opacity: 0.8; }
 .page-link.is-disabled { opacity: 0.4; }
 .page-status { color: inherit; opacity: 0.7; }
 
@@ -885,7 +876,7 @@ body.blog-surface .page-link { color: inherit; opacity: 0.8; }
 .top-search input::placeholder { color: var(--c-link-nav); opacity: 0.7; }
 .top-search input:focus { background: #fff; color: var(--c-ink); width: 340px; }
 
-.search-page { max-width: 640px; }
+.search-page { max-width: 100%; }
 .search-form { display: flex; gap: 8px; margin-bottom: 16px; }
 .search-form input[type="search"] { flex: 1; }
 .search-form select { width: auto; }
@@ -960,3 +951,110 @@ body.blog-surface .search-section { color: inherit; }
 .btn-danger:hover { background: linear-gradient(to bottom, #a94442, #b95448); }
 .icon-link-muted { opacity: 0.35; }
 .icon-link-muted:hover { opacity: 0.8; }
+
+/* ---------- Приватность, закрепление, embeds ---------- */
+
+.pin-badge {
+  display: inline-block;
+  font: bold 10px/1 var(--font-ui);
+  color: var(--c-ink-soft);
+  background: var(--c-surface-muted);
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+.is-active-pin { color: var(--c-accent); opacity: 1 !important; }
+
+.embed-box { position: relative; padding-top: 56.25%; border-radius: 3px; overflow: hidden; background: #000; }
+.embed-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* Подписка на тег */
+.tag-follow-form { margin: 0 0 14px; }
+.tag-letter { background: var(--c-accent); color: #fff; width: 22px; height: 22px; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+
+/* Комментарии 2.0 */
+.comment-actions { display: inline-flex; gap: 10px; margin-top: 4px; }
+.comment-like {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: none; border: 0; cursor: pointer; padding: 2px 4px;
+  color: var(--c-ink-soft); font: bold 11px/1 var(--font-ui); border-radius: 3px;
+}
+.comment-like .icon { width: 13px; height: 13px; }
+.comment-like:hover { background: var(--c-surface-muted); }
+.comment-like.is-liked { color: var(--c-like); }
+.comment-reply { margin-left: 32px; background: var(--c-surface-raise); }
+.comment-reply-btn { background: none; border: 0; cursor: pointer; color: var(--c-link); font: 11px/1 var(--font-ui); padding: 2px 4px; border-radius: 3px; }
+.comment-reply-btn:hover { background: var(--c-surface-muted); }
+.reply-hint { color: var(--c-link); }
+
+/* ---------- WYSIWYG-редактор ---------- */
+
+.wysiwyg-editor {
+  min-height: 140px;
+  padding: 8px 10px;
+  font: 14px/1.5 var(--font-base);
+  color: var(--c-ink-strong);
+  background: var(--c-surface-raise);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-btn);
+  outline: none;
+  overflow-y: auto;
+  word-break: break-word;
+}
+.wysiwyg-editor:focus { background: #fff; border-color: var(--c-accent); box-shadow: 0 0 0 2px rgba(87,145,187,0.25); }
+.wysiwyg-editor:empty::before { content: attr(data-placeholder); color: var(--c-ink-muted); }
+.wysiwyg-editor h2 { font-size: 18px; margin: 10px 0 6px; }
+.wysiwyg-editor blockquote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid var(--c-line); color: #666; }
+.wysiwyg-editor ul { padding-left: 22px; }
+.wysiwyg-toolbar[hidden] { display: none; }
+.wysiwyg-emoji-panel[hidden] { display: none; }
+.wysiwyg-toolbar {
+  position: absolute;
+  z-index: 90;
+  display: flex;
+  gap: 2px;
+  background: var(--c-header);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-soft);
+  padding: 3px;
+}
+.wb-btn {
+  min-width: 28px;
+  padding: 4px 7px;
+  font: bold 12px/1 var(--font-base);
+  color: var(--c-link-nav);
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.wb-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.wb-bold { font-weight: bold; }
+.wb-italic { font-style: italic; font-family: Georgia, serif; }
+.wb-underline { text-decoration: underline; }
+.wb-strike { text-decoration: line-through; }
+.wysiwyg-emoji-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 95;
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  background: var(--c-header);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-soft);
+  padding: 4px;
+}
+.we-btn { background: none; border: 0; font-size: 18px; cursor: pointer; border-radius: 4px; padding: 2px; }
+.we-btn:hover { background: rgba(255,255,255,0.15); }
+
+/* Графики статистики */
+.stat-chart { width: 100%; height: 110px; display: block; margin-bottom: 14px; }
+
+/* Оформление блога по-новому: баннер + акцент */
+.blog-banner { margin: -24px -22px 14px; border-radius: var(--radius-card) var(--radius-card) 0 0; overflow: hidden; }
+.blog-banner img { width: 100%; height: 140px; object-fit: cover; display: block; }
+.blog-identity .blog-title a { color: var(--blog-accent, var(--c-ink-strong)); }
+.blog-identity .blog-ask a { color: #fff; background: var(--blog-accent, var(--c-accent)); border-color: rgba(0,0,0,0.15); }
+.banner-preview img { width: 100%; max-height: 120px; object-fit: cover; border-radius: var(--radius-btn); }

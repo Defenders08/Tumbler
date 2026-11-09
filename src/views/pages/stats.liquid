@@ -16,6 +16,18 @@
     <div class="stat"><span class="stat-n">{{ stats.followers }}</span><span>{{ 'social.followers_label' | t: locale }}</span></div>
   </div>
 
+  <h2 class="form-section">{{ 'stats.chart_views' | t: locale }} ({{ days }})</h2>
+  <svg class="stat-chart" viewBox="0 0 {{ viewsChart.width }} {{ viewsChart.height }}" preserveAspectRatio="none" role="img">
+    <polyline fill="none" stroke="{{ viewsChart.color }}" stroke-width="2.5" points="{{ viewsChart.points }}"/>
+    <circle cx="{{ viewsChart.dotX }}" cy="{{ viewsChart.dotY }}" r="3.5" fill="{{ viewsChart.color }}"/>
+  </svg>
+
+  <h2 class="form-section">{{ 'stats.chart_likes' | t: locale }} ({{ days }})</h2>
+  <svg class="stat-chart" viewBox="0 0 {{ likesChart.width }} {{ likesChart.height }}" preserveAspectRatio="none" role="img">
+    <polyline fill="none" stroke="{{ likesChart.color }}" stroke-width="2.5" points="{{ likesChart.points }}"/>
+    <circle cx="{{ likesChart.dotX }}" cy="{{ likesChart.dotY }}" r="3.5" fill="{{ likesChart.color }}"/>
+  </svg>
+
   <h2 class="form-section">{{ 'stats.top_posts' | t: locale }}</h2>
   {% if topPosts.size == 0 %}
   <p class="hint">{{ 'stats.empty' | t: locale }}</p>

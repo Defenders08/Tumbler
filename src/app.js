@@ -21,7 +21,7 @@ import { pagesRoutes } from './modules/pages/routes.js';
 import { socialApiRoutes, socialFormRoutes } from './modules/social/routes.js';
 
 import { searchRoutes, askRoutes, newAsksForUser } from './modules/asks/routes.js';
-import { followedBlogs, followedCount } from './modules/social/service.js';
+import { followedBlogs, followedCount, followedTags } from './modules/social/service.js';
 import { reportRoutes, adminRoutes } from './modules/moderation/routes.js';
 import { apiV1Routes } from './modules/api/routes.js';
 import { notificationRoutes, unreadForUser } from './modules/notifications/routes.js';
@@ -51,6 +51,7 @@ export function createApp(ctx) {
       'Content-Security-Policy':
         "default-src 'self'; img-src 'self' data: blob:; media-src 'self'; " +
         "style-src 'self' 'unsafe-inline'; script-src 'self'; frame-ancestors 'self'; form-action 'self'; " +
+        "frame-src https://www.youtube.com https://player.vimeo.com https://w.soundcloud.com; " +
         "base-uri 'self'; object-src 'none'",
     });
     next();
@@ -90,6 +91,7 @@ export function createApp(ctx) {
         : 0;
       res.locals.subscriptions = followedBlogs(ctx.db, req.user.id, 10);
       res.locals.subscriptionsCount = followedCount(ctx.db, req.user.id);
+      res.locals.myTags = followedTags(ctx.db, req.user.id, 10);
     }
     // Visitor id для дедупликации просмотров (без персональных данных).
     if (!req.cookies?.['tumbler.visitor']) {
@@ -116,7 +118,7 @@ export function createApp(ctx) {
   app.use(postsRoutes(ctx, csrf, ctx.upload));
   app.use(socialFormRoutes(ctx, csrf));
   app.use(socialApiRoutes(ctx, csrf));
-  app.use(searchRoutes(ctx));
+  app.use(searchRoutes(ctx, csrf));
   app.use(askRoutes(ctx, csrf));
   app.use(notificationRoutes(ctx));
   app.use(reportRoutes(ctx, csrf));

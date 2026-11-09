@@ -17,6 +17,11 @@ import { requireAuth } from '../auth/session.js';
 import { renderDashboardPage } from '../pages/dashboard.js';
 import { syncPost } from '../search/service.js';
 
+function safeBackPath(value, slug) {
+  if (typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')) return value;
+  return '/' + slug;
+}
+
 function isComposerError(err) {
   return (err instanceof FormError || err instanceof MediaError) && (err.status === 422 || err.status === 404);
 }
@@ -64,12 +69,15 @@ export function postsRoutes(ctx, csrf, upload) {
     } catch (err) {
       if (isComposerError(err) && err.status === 422) {
         // Понятная ошибка с сохранением введённых значений (файлы повторно приложить).
+        const errValues = { ...req.body };
+        // Для WYSIWYG-редактора: вернуть HTML предзаполнение
+        if (typeof errValues.body === 'string') errValues.body_html = renderMarkdown(errValues.body);
         return renderDashboardPage(ctx, req, res, {
           status: 422,
           composerError: ctx.translate(req, err.code),
           composerErrorNote: ctx.translate(req, 'composer.file_note'),
           openType: POST_TYPES.includes(req.body.type) ? req.body.type : 'text',
-          values: req.body,
+          values: errValues,
         });
       }
       next(err);
@@ -113,6 +121,8 @@ export function postsRoutes(ctx, csrf, upload) {
         view.body_html = renderPlain(typeof req.body.description === 'string' ? req.body.description.slice(0, 2000) : '');
       } else if (type === 'audio' || type === 'video') {
         view.title = typeof req.body.title === 'string' ? req.body.title.trim().slice(0, 200) || null : null;
+        const link = typeof req.body.link_url === 'string' ? req.body.link_url.trim() : '';
+        view.link_url = link.slice(0, 2048);
         view.body_html = renderMarkdown(text.slice(0, 10000));
       } else {
         view.body_html = renderMarkdown(text.slice(0, 10000));
@@ -141,12 +151,15 @@ export function postsRoutes(ctx, csrf, upload) {
       const values = {
         title: decorated.title,
         body: decorated.body,
+        body_html: decorated.body_html,
         quote: decorated.quote_text,
         source: decorated.body,
         url: decorated.link_url,
+        link_url: decorated.link_url,
         description: decorated.body,
         tags: decorated.tags.join(', '),
         nsfw: decorated.nsfw ? 'on' : null,
+        visibility: decorated.visibility,
       };
       res.render('pages/edit_post', { title: ctx.translate(req, 'post.edit'), post: decorated, values });
     } catch (err) {
@@ -168,6 +181,45 @@ export function postsRoutes(ctx, csrf, upload) {
           errorText: ctx.translate(req, err.code),
         });
       }
+      next(err);
+    }
+  });
+
+  // Закрепить/открепить пост в блоге (только владелец).
+  router.post('/posts/:id/pin', csrf.protection, (req, res, next) => {
+    try {
+      const blog = getBlogByUserId(ctx.db, req.user.id);
+      const post = blog && getPostById(ctx.db, req.params.id);
+      if (!blog || !post || post.blog_id !== blog.id) {
+        return res.status(404).render('pages/errors/error', {
+          title: ctx.translate(req, 'errors.404_title'),
+          errorText: ctx.translate(req, 'errors.404_text'),
+        });
+      }
+      const unpin = req.body.unpin === '1';
+      ctx.db.prepare('UPDATE posts SET pinned_at = ?, updated_at = ? WHERE id = ?')
+        .run(unpin ? null : Date.now(), Date.now(), post.id);
+      res.redirect(303, safeBackPath(req.body.back, blog.slug));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Открепить пост.
+  router.post('/posts/:id/unpin', csrf.protection, (req, res, next) => {
+    try {
+      const blog = getBlogByUserId(ctx.db, req.user.id);
+      const post = blog && getPostById(ctx.db, req.params.id);
+      if (!blog || !post || post.blog_id !== blog.id) {
+        return res.status(404).render('pages/errors/error', {
+          title: ctx.translate(req, 'errors.404_title'),
+          errorText: ctx.translate(req, 'errors.404_text'),
+        });
+      }
+      ctx.db.prepare('UPDATE posts SET pinned_at = NULL, updated_at = ? WHERE id = ?')
+        .run(Date.now(), post.id);
+      res.redirect(303, safeBackPath(req.body.back, blog.slug));
+    } catch (err) {
       next(err);
     }
   });

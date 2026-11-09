@@ -75,7 +75,7 @@ export function apiV1Routes(ctx) {
   router.get('/api/v1/posts/:id', (req, res, next) => {
     try {
       const post = getPostById(ctx.db, req.params.id);
-      if (!post || post.status !== 'published') {
+      if (!post || post.status !== 'published' || post.visibility !== 'public') {
         return json(res, 404, { error: { code: 'not_found', message: 'Post not found' } });
       }
       const [decorated] = decoratePosts(ctx.db, [post], null);
@@ -200,7 +200,7 @@ export function apiV1Routes(ctx) {
       const rows = ctx.db
         .prepare(
           `SELECT p.id FROM posts p
-           WHERE p.status = 'published' AND p.id IN
+           WHERE p.status = 'published' AND p.visibility = 'public' AND p.id IN
              (SELECT pt.post_id FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE t.name = ?)
            ORDER BY p.published_at DESC LIMIT ? OFFSET ?`
         )
@@ -208,7 +208,7 @@ export function apiV1Routes(ctx) {
       const total = ctx.db
         .prepare(
           `SELECT COUNT(*) AS n FROM posts p
-           WHERE p.status = 'published' AND p.id IN
+           WHERE p.status = 'published' AND p.visibility = 'public' AND p.id IN
              (SELECT pt.post_id FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE t.name = ?)`
         )
         .get(name).n;
@@ -255,12 +255,12 @@ function publicPosts(db, { page, perPage, type }) {
        JOIN blogs b ON b.id = p.blog_id
        JOIN users u ON u.id = b.user_id
        LEFT JOIN media am ON am.id = b.avatar_media_id
-       WHERE p.status = 'published' ${typeCond}
+       WHERE p.status = 'published' AND p.visibility = 'public' ${typeCond}
        ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`
     )
     .all(...args, perPage, offset);
   const total = db
-    .prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.status = 'published' ${typeCond}`)
+    .prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.status = 'published' AND p.visibility = 'public' ${typeCond}`)
     .get(...args).n;
   return { rows, total, page, perPage, pages: Math.max(1, Math.ceil(total / perPage)) };
 }

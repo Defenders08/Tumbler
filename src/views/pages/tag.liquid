@@ -1,9 +1,18 @@
 {% layout 'layout' %}
 {% block content %}
+<div class="feed">
     <div class="page-heading">
       <h1>#{{ tag }}</h1>
       <span class="page-sub">{{ total }}</span>
     </div>
+
+    {% if user %}
+    {% if followingTag %}{% assign tagBtn = 'social.following' %}{% assign tagCls = 'btn-secondary' %}{% else %}{% assign tagBtn = 'social.follow' %}{% assign tagCls = 'btn-success' %}{% endif %}
+    <form method="post" action="/tag/{{ tag }}/follow" class="tag-follow-form">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn btn-sm {{ tagCls }}">{{ tagBtn | t: locale }}</button>
+    </form>
+    {% endif %}
 
     {% if posts.size == 0 %}
     {% assign emptyText = 'search.nothing' | t: locale %}
@@ -16,5 +25,5 @@
 
     {% assign tagPath = '/tag/' | append: tag %}
     {% include 'partials/pagination', page: page, pages: pages, basePath: tagPath %}
-  </div>
+</div>
 {% endblock %}

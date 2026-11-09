@@ -5,6 +5,7 @@
 </div>
 <div class="field">
   <label for="{{ prefix }}body">{{ 'composer.body' | t: locale }}</label>
-  <textarea id="{{ prefix }}body" name="body" rows="8" required>{{ values.body }}</textarea>
-  <p class="hint">Markdown</p>
+  <div class="wysiwyg-wrap">
+    <textarea class="js-wysiwyg" name="body" rows="8" required data-html="{{ values.body_html }}"></textarea>
+  </div>
 </div>

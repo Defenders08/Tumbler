@@ -39,6 +39,15 @@
   {% assign coverItem = m %}
   {% endif %}
   {% endfor %}
+  {% assign audioEmbed = post.link_url | embedUrl: 'audio' %}
+  {% if audioEmbed %}
+  <div class="post-media">
+    <div class="embed-box">
+      <iframe src="{{ audioEmbed }}" allow="autoplay" frameborder="no" loading="lazy"></iframe>
+    </div>
+  </div>
+  {% if post.title %}<h2 class="post-title">{{ post.title }}</h2>{% endif %}
+  {% else %}
   <div class="audio-card{% if coverItem %} has-cover{% endif %}">
     {% if coverItem %}
     <img class="audio-cover" src="/media/{{ coverItem.storage_key }}" alt="">
@@ -50,6 +59,7 @@
       {% endif %}
     </div>
   </div>
+  {% endif %}
   {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
 {% when 'video' %}
   {% assign videoItem = null %}
@@ -58,11 +68,18 @@
   {% assign videoItem = m %}
   {% endif %}
   {% endfor %}
+  {% assign videoEmbed = post.link_url | embedUrl: 'video' %}
   {% if videoItem %}
   <div class="post-media">
     <figure class="post-figure">
       <video controls preload="metadata" src="/media/{{ videoItem.storage_key }}"></video>
     </figure>
+  </div>
+  {% elsif videoEmbed %}
+  <div class="post-media">
+    <div class="embed-box">
+      <iframe src="{{ videoEmbed }}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0" loading="lazy"></iframe>
+    </div>
   </div>
   {% endif %}
   {% if post.title %}<h2 class="post-title">{{ post.title }}</h2>{% endif %}

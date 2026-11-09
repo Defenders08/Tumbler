@@ -5,6 +5,34 @@ import { renderPlain } from '../posts/render.js';
 import { notify, notifyPostAuthor } from '../notifications/service.js';
 import { canInteract } from '../moderation/service.js';
 
+// ---------- Подписка на теги ----------
+
+export function isFollowingTag(db, userId, tagId) {
+  return Boolean(db.prepare('SELECT 1 FROM tag_follows WHERE user_id = ? AND tag_id = ?').get(userId, tagId));
+}
+
+export function followedTags(db, userId, limit = 10) {
+  return db
+    .prepare(
+      `SELECT t.id, t.name FROM tag_follows tf JOIN tags t ON t.id = tf.tag_id
+       WHERE tf.user_id = ? ORDER BY tf.created_at DESC LIMIT ?`
+    )
+    .all(userId, limit);
+}
+
+export function toggleTagFollow(db, userId, tagId) {
+  return db.transaction(() => {
+    const del = db.prepare('DELETE FROM tag_follows WHERE user_id = ? AND tag_id = ?').run(userId, tagId);
+    if (del.changes > 0) return { following: false };
+    db.prepare('INSERT INTO tag_follows (user_id, tag_id, created_at) VALUES (?, ?, ?)').run(userId, tagId, Date.now());
+    return { following: true };
+  })();
+}
+
+export function followedTagsCount(db, userId) {
+  return db.prepare('SELECT COUNT(*) AS n FROM tag_follows WHERE user_id = ?').get(userId).n;
+}
+
 export class SocialError extends Error {
   constructor(code, { status = 422 } = {}) {
     super(code);
@@ -81,7 +109,7 @@ export function toggleLike(db, userId, postId) {
 
 // ---------- Комментарии ----------
 
-export function addComment(db, postId, userId, rawBody) {
+export function addComment(db, postId, userId, rawBody, parentId = null) {
   const body = typeof rawBody === 'string' ? rawBody.trim() : '';
   if (!body) throw new SocialError('social.comment_empty');
   if (body.length > COMMENT_MAX) throw new SocialError('social.comment_too_long');
@@ -94,15 +122,39 @@ export function addComment(db, postId, userId, rawBody) {
     .get(postId);
   if (!post) throw new SocialError('social.post_not_published', { status: 404 });
   if (!canInteract(db, userId, post.author_id)) throw new SocialError('social.blocked', { status: 403 });
+  // Родитель — видимый комментарий того же поста; ответы только на комментарии верхнего уровня.
+  let parent = null;
+  if (parentId) {
+    parent = db.prepare("SELECT * FROM comments WHERE id = ? AND post_id = ? AND status = 'visible'").get(parentId, postId);
+    if (!parent) throw new SocialError('social.comment_not_found', { status: 404 });
+    if (parent.parent_id) parent = db.prepare('SELECT * FROM comments WHERE id = ?').get(parent.parent_id);
+  }
   const now = Date.now();
   const html = renderPlain(body.slice(0, COMMENT_MAX));
   return db.transaction(() => {
     const info = db
-      .prepare('INSERT INTO comments (post_id, user_id, body, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(postId, userId, html, 'visible', now, now);
+      .prepare('INSERT INTO comments (post_id, parent_id, user_id, body, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .run(postId, parent ? parent.id : null, userId, html, 'visible', now, now);
     db.prepare('UPDATE posts SET comment_count = comment_count + 1 WHERE id = ?').run(postId);
     notifyPostAuthor(db, postId, 'comment', userId);
     return db.prepare('SELECT * FROM comments WHERE id = ?').get(info.lastInsertRowid);
+  })();
+}
+
+// ---------- Лайки комментариев ----------
+
+export function toggleCommentLike(db, userId, commentId) {
+  const comment = db.prepare("SELECT * FROM comments WHERE id = ? AND status = 'visible'").get(commentId);
+  if (!comment) throw new SocialError('social.comment_not_found', { status: 404 });
+  return db.transaction(() => {
+    const del = db.prepare('DELETE FROM comment_likes WHERE user_id = ? AND comment_id = ?').run(userId, commentId);
+    if (del.changes > 0) {
+      db.prepare('UPDATE comments SET like_count = MAX(like_count - 1, 0) WHERE id = ?').run(commentId);
+      return { liked: false };
+    }
+    db.prepare('INSERT INTO comment_likes (user_id, comment_id, created_at) VALUES (?, ?, ?)').run(userId, commentId, Date.now());
+    db.prepare('UPDATE comments SET like_count = like_count + 1 WHERE id = ?').run(commentId);
+    return { liked: true };
   })();
 }
 

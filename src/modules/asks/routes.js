@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { createAsk, listAsks, askCount, getAsk, answerAsk, ignoreAsk, deleteAsk, AskError } from './service.js';
 import { searchPosts, searchBlogs, searchTags, postsByTag, tagExists } from '../search/service.js';
+import { isFollowingTag, toggleTagFollow } from '../social/service.js';
 import { getBlogView } from '../blogs/service.js';
 import { getBlogByUserId } from '../blogs/service.js';
 import { requireAuth } from '../auth/session.js';
@@ -12,7 +13,7 @@ import { translate } from '../../lib/i18n.js';
 const SLUG_RE = /^[a-z0-9-]{3,32}$/;
 const TAG_RE = /^[^<>"'&]{1,60}$/;
 
-export function searchRoutes(ctx) {
+export function searchRoutes(ctx, csrf) {
   const router = Router();
 
   const renderSearch = (req, res, extra = {}) => {
@@ -55,17 +56,35 @@ export function searchRoutes(ctx) {
     }
   });
 
+  router.post('/tag/:name/follow', csrf.protection, (req, res, next) => {
+    try {
+      const name = String(req.params.name ?? '').trim().toLowerCase().slice(0, 30);
+      if (!name) return next();
+      const tag = ctx.db.prepare('SELECT id FROM tags WHERE name = ?').get(name);
+      if (!tag) return next();
+      if (!req.user) return res.redirect(`/login?back=/tag/${encodeURIComponent(name)}`);
+      toggleTagFollow(ctx.db, req.user.id, tag.id);
+      res.redirect(303, `/tag/${encodeURIComponent(name)}`);
+    } catch (err) {
+      next(err);
+    }
+  });
+
   router.get('/tag/:name', (req, res, next) => {
     try {
       const name = String(req.params.name ?? '').trim().toLowerCase();
       if (!name || !TAG_RE.test(name)) return next();
       const page = Math.max(1, Number.parseInt(String(req.query.page ?? '1'), 10) || 1);
+      const followingTag = req.user
+        ? isFollowingTag(ctx.db, req.user.id, (ctx.db.prepare('SELECT id FROM tags WHERE name = ?').get(name) ?? {}).id)
+        : false;
       const result = postsByTag(ctx.db, name, { page, perPage: 10 });
       const posts = decoratePosts(ctx.db, result.rows, req.user ? { userId: req.user.id } : null);
       res.render('pages/tag', {
         title: `#${name}`,
         tag: name,
         exists: result.total > 0 || tagExists(ctx.db, name),
+        followingTag,
         posts,
         total: result.total,
         page: result.page,

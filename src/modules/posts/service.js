@@ -19,6 +19,35 @@ export class FormError extends Error {
 
 export const POST_TYPES = ['text', 'photo', 'quote', 'link', 'audio', 'video', 'gif'];
 
+// Ссылки на платформы, которые превращаются в embed-плеер (ADR: YouTube/Vimeo/SoundCloud).
+const EMBED_HOSTS = {
+  video: [
+    { re: /^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([\w-]{6,})/i, make: (id) => `https://www.youtube.com/embed/${id}` },
+    { re: /^https:\/\/youtu\.be\/([\w-]{6,})/i, make: (id) => `https://www.youtube.com/embed/${id}` },
+    { re: /^https:\/\/(?:www\.)?vimeo\.com\/(\d{6,})/i, make: (id) => `https://player.vimeo.com/video/${id}` },
+  ],
+  audio: [
+    { re: /^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+/i, make: (url) => `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=false&hide_related=true` },
+  ],
+};
+
+// Проверка: ссылка принадлежит разрешённой платформе.
+export function isEmbedUrl(url, type) {
+  const rules = EMBED_HOSTS[type];
+  return Boolean(rules && rules.some((r) => r.re.test(url)));
+}
+
+// Embed-URL для iframe (или null, если платформа не распознана).
+export function embedUrlFor(url, type) {
+  const rules = EMBED_HOSTS[type];
+  if (!rules) return null;
+  for (const rule of rules) {
+    const m = String(url ?? '').match(rule.re);
+    if (m) return rule.re.source.includes('soundcloud') ? rule.make(url) : rule.make(m[1]);
+  }
+  return null;
+}
+
 const LIMITS = {
   title: 200,
   body: 50_000,
@@ -101,7 +130,9 @@ function buildFields(type, input) {
     case 'video': {
       const title = optional(input.title, LIMITS.title);
       const caption = optional(input.body, LIMITS.caption);
-      return { title, body: caption, body_html: caption ? renderMarkdown(caption) : '', quote_text: null, link_url: null };
+      const link = optional(input.link_url, LIMITS.url);
+      if (link && !isEmbedUrl(link, type)) throw new FormError('composer.errors.bad_embed');
+      return { title, body: caption, body_html: caption ? renderMarkdown(caption) : '', quote_text: null, link_url: link };
     }
     default:
       throw new FormError('composer.errors.required_text');
@@ -115,6 +146,7 @@ export async function createPost(ctx, blog, input, files, action) {
 
   const limits = getUploadLimits(ctx.db);
   let status = action === 'draft' ? 'draft' : 'published';
+  const visibility = input.visibility === 'private' ? 'private' : 'public';
   if (action === 'queue') status = 'queued';
   if (action === 'schedule') status = 'scheduled';
   const now = Date.now();
@@ -154,14 +186,25 @@ export async function createPost(ctx, blog, input, files, action) {
       await handle(list[0], 'gif');
     } else if (type === 'audio') {
       const list = filesByName(files, 'file');
+      if (list.length === 0 && !fields.link_url) throw new FormError('composer.errors.required_file_or_link');
+      if (list.length === 0) { /* пост по ссылке */ }
+      if (list.length > 0 && fields.link_url) throw new FormError('composer.errors.file_or_link_not_both');
+      if (list.length > limits.maxFilesPerPost) throw new FormError('composer.errors.too_many_files');
+      for (const file of list) await handle(file, 'audio');
+      const cover = filesByName(files, 'cover')[0];
+      if (cover) await handle(cover, 'cover');
+    } else if (type === 'audio') {
+      const list = filesByName(files, 'file');
       if (list.length === 0) throw new FormError('composer.errors.required_file');
       await handle(list[0], 'audio');
       const cover = filesByName(files, 'cover')[0];
       if (cover) await handle(cover, 'cover');
     } else if (type === 'video') {
       const list = filesByName(files, 'file');
-      if (list.length === 0) throw new FormError('composer.errors.required_file');
-      await handle(list[0], 'video');
+      if (list.length === 0 && !fields.link_url) throw new FormError('composer.errors.required_file_or_link');
+      if (list.length > 0 && fields.link_url) throw new FormError('composer.errors.file_or_link_not_both');
+      if (list.length > 1) throw new FormError('composer.errors.too_many_files');
+      for (const file of list) await handle(file, 'video');
     } else if (type === 'text' || type === 'quote' || type === 'link') {
       const stray = filesByName(files, 'media').length + filesByName(files, 'file').length;
       if (stray > 0) throw new FormError('composer.errors.bad_media');
@@ -169,7 +212,7 @@ export async function createPost(ctx, blog, input, files, action) {
 
     const scheduledAt = action === 'schedule' ? Number(input.scheduled_at_utc) : null;
     const queuedAt = action === 'queue' ? now : null;
-    const post = ctx.db.transaction(() => insertPost(ctx, blog.id, { type, ...fields, status, nsfw, now, scheduledAt, queuedAt }, mediaRows, tags))();
+    const post = ctx.db.transaction(() => insertPost(ctx, blog.id, { type, ...fields, status, nsfw, now, visibility, scheduledAt, queuedAt }, mediaRows, tags))();
     if (status !== 'scheduled' && status !== 'queued') syncPost(ctx.db, post.id);
     return post;
   } catch (err) {
@@ -181,13 +224,13 @@ export async function createPost(ctx, blog, input, files, action) {
   }
 }
 
-function insertPost(ctx, blogId, { type, title, body, body_html, quote_text, link_url, status, nsfw, now, scheduledAt = null, queuedAt = null }, mediaRows, tags) {
+function insertPost(ctx, blogId, { type, title, body, body_html, quote_text, link_url, status, nsfw, now, visibility = 'public', scheduledAt = null, queuedAt = null }, mediaRows, tags) {
   const info = ctx.db
     .prepare(
       `INSERT INTO posts
-        (blog_id, type, title, body, body_html, quote_text, link_url, status, nsfw,
+        (blog_id, type, title, body, body_html, quote_text, link_url, status, nsfw, visibility,
          published_at, scheduled_at, queued_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       blogId,
@@ -199,6 +242,7 @@ function insertPost(ctx, blogId, { type, title, body, body_html, quote_text, lin
       link_url,
       status,
       nsfw,
+      visibility,
       status === 'published' ? now : null,
       scheduledAt,
       queuedAt,
@@ -239,6 +283,7 @@ export function updatePost(ctx, blog, postId, input, publishNow = false) {
     source: input.source,
     url: input.url ?? post.link_url,
     description: input.description,
+    link_url: input.link_url ?? post.link_url,
   });
 
   const status = publishNow && post.status === 'draft' ? 'published' : post.status;
@@ -289,13 +334,19 @@ export const POST_JOIN = `
   LEFT JOIN media am ON am.id = b.avatar_media_id
 `;
 
-export function listBlogPosts(db, blogId, status, { page = 1, perPage = 10, byUpdated = false }) {
+export function listBlogPosts(db, blogId, status, { page = 1, perPage = 10, byUpdated = false, includePrivate = false } = {}) {
   const offset = (page - 1) * perPage;
-  const order = byUpdated ? 'p.updated_at DESC' : 'p.published_at DESC, p.id DESC';
+  const visCond = includePrivate ? '' : "AND p.visibility = 'public'";
+  // На странице блога закреплённые — первыми, затем хронология.
+  const order = byUpdated
+    ? 'p.updated_at DESC'
+    : '(p.pinned_at IS NULL) ASC, p.pinned_at DESC, p.published_at DESC, p.id DESC';
   const rows = db
-    .prepare(`${POST_JOIN} WHERE p.blog_id = ? AND p.status = ? ORDER BY ${order} LIMIT ? OFFSET ?`)
+    .prepare(`${POST_JOIN} WHERE p.blog_id = ? AND p.status = ? ${visCond} ORDER BY ${order} LIMIT ? OFFSET ?`)
     .all(blogId, status, perPage, offset);
-  const total = db.prepare('SELECT COUNT(*) AS n FROM posts WHERE blog_id = ? AND status = ?').get(blogId, status).n;
+  const total = db
+    .prepare(`SELECT COUNT(*) AS n FROM posts WHERE blog_id = ? AND status = ? ${visCond.replaceAll('p.', '')}`)
+    .get(blogId, status).n;
   return { rows, total, page, perPage, pages: Math.max(1, Math.ceil(total / perPage)) };
 }
 
@@ -348,13 +399,14 @@ export function decoratePosts(db, posts, viewer = null) {
     }
   }
 
-  // Комментарии (видимые) с автором-блогом.
+  // Комментарии (видимые) с автором-блогом; replies — на второй уровень.
   const commentsMap = new Map();
   if (ids.length > 0) {
     const ph = ids.map(() => '?').join(',');
     const rows = db
       .prepare(
-        `SELECT c.id, c.post_id, c.body, c.created_at, b.slug AS blog_slug, b.title AS blog_title,
+        `SELECT c.id, c.post_id, c.parent_id, c.like_count, c.body, c.created_at,
+                b.slug AS blog_slug, b.title AS blog_title,
                 am.storage_key AS avatar_key, c.user_id
          FROM comments c
          JOIN blogs b ON b.user_id = c.user_id
@@ -363,7 +415,17 @@ export function decoratePosts(db, posts, viewer = null) {
          ORDER BY c.created_at ASC`
       )
       .all(...ids);
+    const likedComments = new Set();
+    if (viewer?.userId && rows.length > 0) {
+      const cph = rows.map(() => '?').join(',');
+      for (const row of db
+        .prepare(`SELECT comment_id FROM comment_likes WHERE user_id = ? AND comment_id IN (${cph})`)
+        .all(viewer.userId, ...rows.map((r) => r.id))) {
+        likedComments.add(row.comment_id);
+      }
+    }
     for (const row of rows) {
+      row.likedByMe = likedComments.has(row.id);
       if (!commentsMap.has(row.post_id)) commentsMap.set(row.post_id, []);
       commentsMap.get(row.post_id).push(row);
     }

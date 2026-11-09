@@ -95,13 +95,13 @@ export function searchPosts(db, query, { type = null, page = 1, perPage = 10 } =
     const args = type ? [type] : [];
     try {
       const base = `${POST_JOIN} JOIN posts_fts f ON f.post_id = p.id
-                    WHERE p.status = 'published' AND posts_fts MATCH ? ${typeCond}`;
+                    WHERE p.status = 'published' AND p.visibility = 'public' AND posts_fts MATCH ? ${typeCond}`;
       rows = db
         .prepare(`${base} ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`)
         .all(fts, ...args, perPage, offset);
       total = db
         .prepare(`SELECT COUNT(*) AS n FROM posts p JOIN posts_fts f ON f.post_id = p.id
-                  WHERE p.status = 'published' AND posts_fts MATCH ? ${typeCond}`)
+                  WHERE p.status = 'published' AND p.visibility = 'public' AND posts_fts MATCH ? ${typeCond}`)
         .get(fts, ...args).n;
       return { rows, total, page, perPage, pages: Math.max(1, Math.ceil(total / perPage)) };
     } catch {
@@ -130,12 +130,12 @@ export function searchPosts(db, query, { type = null, page = 1, perPage = 10 } =
   const where = conds.length > 0 ? `AND ${conds.join(' AND ')}` : '';
   rows = db
     .prepare(
-      `${POST_JOIN} WHERE p.status = 'published' ${where}
+      `${POST_JOIN} WHERE p.status = 'published' AND p.visibility = 'public' ${where}
        ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`
     )
     .all(...args, perPage, offset);
   total = db
-    .prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.status = 'published' ${where}`)
+    .prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.status = 'published' AND p.visibility = 'public' ${where}`)
     .get(...args).n;
   return { rows, total, page, perPage, pages: Math.max(1, Math.ceil(total / perPage)) };
 }
@@ -196,7 +196,7 @@ export function searchTags(db, query, { limit = 10 } = {}) {
       `SELECT t.name, COUNT(pt.post_id) AS post_count
        FROM tags t
        JOIN post_tags pt ON pt.tag_id = t.id
-       JOIN posts p ON p.id = pt.post_id AND p.status = 'published'
+       JOIN posts p ON p.id = pt.post_id AND p.status = 'published' AND p.visibility = 'public'
        WHERE t.name LIKE ? ESCAPE '\\'
        GROUP BY t.id
        ORDER BY post_count DESC, t.name
