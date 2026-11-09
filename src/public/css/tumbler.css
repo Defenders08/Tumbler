@@ -150,8 +150,7 @@ h1, h2, h3 { color: var(--c-ink-strong); margin: 0 0 8px; }
 
 /* ---------- Верхняя панель дашборда ---------- */
 
-/* Шапка с собственным фоном: на дашборде сливается с фоном, на светлом блоге читается */
-.top-bar { color: #fff; background: linear-gradient(to bottom, var(--c-bg-gradient-top), var(--c-bg)); }
+.top-bar { color: #fff; } /* без подложки — сливается с фоном страницы */
 
 .top-bar-inner {
   max-width: var(--w-container);
@@ -256,7 +255,7 @@ h1, h2, h3 { color: var(--c-ink-strong); margin: 0 0 8px; }
   gap: 20px;
   align-items: flex-start;
 }
-.feed { width: 100%; display: flex; flex-direction: column; gap: 24px; }
+.feed { width: 100%; display: flex; flex-direction: column; gap: 16px; }
 .sidebar { width: var(--w-sidebar); color: #fff; display: flex; flex-direction: column; gap: 12px; }
 
 .narrow-page { width: 100%; margin: 0 auto; }
@@ -270,7 +269,7 @@ h1, h2, h3 { color: var(--c-ink-strong); margin: 0 0 8px; }
   border-bottom: 2px solid var(--c-line);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  padding: 18px 22px;
+  padding: 13px 18px;
   position: relative;
 }
 
@@ -358,7 +357,7 @@ h1, h2, h3 { color: var(--c-ink-strong); margin: 0 0 8px; }
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 0 10px;
+  padding: 2px 0 6px;
 }
 .composer-type {
   background: none;
@@ -449,7 +448,7 @@ input[type="file"]::file-selector-button {
 .panel {
   background: rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-card);
-  padding: 20px 22px;
+  padding: 16px 18px;
 }
 
 /* На тёмных страницах заголовки секций должны быть читаемыми */
@@ -472,7 +471,7 @@ body.dash-page .app-main .page-heading h1 { color: #fff; }
 .post-card:hover .dogear { opacity: 0.9; }
 .dogear .icon { width: 23px; height: 23px; }
 
-.post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 
 .post-avatar {
   width: 40px;
@@ -554,7 +553,7 @@ body.dash-page .app-main .page-heading h1 { color: #fff; }
 
 /* Действия и футер карточки */
 
-.post-foot { margin-top: 14px; }
+.post-foot { margin-top: 10px; }
 
 .post-tags { margin-bottom: 6px; }
 .tag {
@@ -603,7 +602,7 @@ body.dash-page .app-main .page-heading h1 { color: #fff; }
 body.blog-surface .top-bar-inner { max-width: 1080px; } /* на странице блога больше действий в шапке */
 .blog-wrap .page-main-offset { margin-top: 20px; }
 
-.blog-identity { text-align: center; padding: 22px 22px 18px; }
+.blog-identity { text-align: center; padding: 18px 18px 14px; }
 .blog-avatar {
   width: 112px;
   height: 112px;
@@ -762,7 +761,7 @@ body.blog-surface .top-bar-inner { max-width: 1080px; } /* на странице
 
 /* ---------- Социальные действия (этап 5) ---------- */
 
-.post-controls { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 10px; }
+.post-controls { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 8px; }
 
 .action-btn {
   display: inline-flex;
@@ -1053,7 +1052,7 @@ body.blog-surface .search-section { color: inherit; }
 .stat-chart { width: 100%; height: 110px; display: block; margin-bottom: 14px; }
 
 /* Оформление блога по-новому: баннер + акцент */
-.blog-banner { margin: -24px -22px 14px; border-radius: var(--radius-card) var(--radius-card) 0 0; overflow: hidden; }
+.blog-banner { margin: -18px -18px 12px; border-radius: var(--radius-card) var(--radius-card) 0 0; overflow: hidden; }
 .blog-banner img { width: 100%; height: 140px; object-fit: cover; display: block; }
 .blog-identity .blog-title a { color: var(--blog-accent, var(--c-ink-strong)); }
 .blog-identity .blog-ask a { color: #fff; background: var(--blog-accent, var(--c-accent)); border-color: rgba(0,0,0,0.15); }
