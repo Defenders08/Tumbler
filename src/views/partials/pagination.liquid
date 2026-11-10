@@ -1,15 +1,17 @@
 {% comment %} Классическая пагинация: «‹ Новее | N/M | Старее ›».
      Параметры: page, pages, basePath (без завершающего слэша). {% endcomment %}
 {% if pages > 1 %}
+{% assign pageSep = '?' %}
+{% if basePath contains '?' %}{% assign pageSep = '&' %}{% endif %}
 <nav class="pagination" aria-label="pagination">
   {% if page > 1 %}
-  <a class="page-link" href="{{ basePath }}?page={{ page | minus: 1 }}">‹ {{ 'pagination.newer' | t: locale }}</a>
+  <a class="page-link" href="{{ basePath }}{{ pageSep }}page={{ page | minus: 1 }}">‹ {{ 'pagination.newer' | t: locale }}</a>
   {% else %}
   <span class="page-link is-disabled">‹ {{ 'pagination.newer' | t: locale }}</span>
   {% endif %}
   <span class="page-status">{{ page }} / {{ pages }}</span>
   {% if page < pages %}
-  <a class="page-link" href="{{ basePath }}?page={{ page | plus: 1 }}">{{ 'pagination.older' | t: locale }} ›</a>
+  <a class="page-link" href="{{ basePath }}{{ pageSep }}page={{ page | plus: 1 }}">{{ 'pagination.older' | t: locale }} ›</a>
   {% else %}
   <span class="page-link is-disabled">{{ 'pagination.older' | t: locale }} ›</span>
   {% endif %}

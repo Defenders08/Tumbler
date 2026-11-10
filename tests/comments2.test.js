@@ -35,6 +35,12 @@ test('ветки: ответ на комментарий хранится с par
     const page = await (await createAgent(t.base)).get('/anna');
     assert.match(page.html, /первый комментарий/);
     assert.match(page.html, /отвечаю тебе/);
+
+    // Форма комментария одна, «Отмена» скрыта до режима ответа.
+    const ownerPage = await a.agent.get('/anna');
+    const forms = ownerPage.html.match(/class="comment-form/g) ?? [];
+    assert.equal(forms.length, 1);
+    assert.match(ownerPage.html, /js-reply-cancel" hidden/);
   } finally {
     await t.close();
   }

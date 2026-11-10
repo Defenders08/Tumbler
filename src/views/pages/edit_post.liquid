@@ -3,7 +3,6 @@
 <div class="narrow-page">
   <div class="page-heading">
     <h1>{{ 'post.edit' | t: locale }}</h1>
-    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
   </div>
 
   <section class="card form-card">
@@ -29,7 +28,7 @@
       {% include 'partials/fields/common', prefix: 'e-', values: values %}
       <div class="form-actions">
         {% if post.status == 'draft' %}
-        <button type="submit" name="action" value="publish" class="btn btn-primary">{{ 'composer.publish' | t: locale }}</button>
+        <button type="submit" name="action" value="publish" class="btn btn-primary btn-publish">{{ 'composer.publish' | t: locale }}</button>
         <button type="submit" name="action" value="save" class="btn btn-secondary">{{ 'post.save' | t: locale }}</button>
         {% else %}
         <button type="submit" name="action" value="save" class="btn btn-primary">{{ 'post.save' | t: locale }}</button>

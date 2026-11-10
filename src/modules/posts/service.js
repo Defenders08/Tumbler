@@ -481,6 +481,22 @@ export function decoratePosts(db, posts, viewer = null) {
   }));
 }
 
+// Общая лента: все опубликованные публичные посты всех блогов.
+export function listGeneralFeed(db, { page = 1, perPage = 10 } = {}) {
+  const offset = (page - 1) * perPage;
+  const rows = db
+    .prepare(
+      `${POST_JOIN}
+       WHERE p.status = 'published' AND p.visibility = 'public'
+       ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`
+    )
+    .all(perPage, offset);
+  const total = db
+    .prepare("SELECT COUNT(*) AS n FROM posts p WHERE p.status = 'published' AND p.visibility = 'public'")
+    .get().n;
+  return { rows, total, page, perPage, pages: Math.max(1, Math.ceil(total / perPage)) };
+}
+
 // Лента дашборда: свои посты + посты подписанных блогов, строго хронологически.
 export function listFeedPosts(db, userId, blogId, { page = 1, perPage = 10 }) {
   const offset = (page - 1) * perPage;

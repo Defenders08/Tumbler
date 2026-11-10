@@ -47,7 +47,10 @@
     "empty": "Nothing here yet. Create your first post!",
     "created": "Post published.",
     "draft_saved": "Draft saved.",
-    "feed_hint": "Follow some blogs — their new posts will appear here in chronological order."
+    "feed_hint": "Follow some blogs — their new posts will appear here in chronological order.",
+    "tab_general": "All posts",
+    "tab_subscriptions": "Subscriptions",
+    "general_hint": "Posts from all blogs will appear here."
   },
   "composer": {
     "new_post": "New post",
@@ -67,6 +70,12 @@
     "link_title": "Link title (optional)",
     "link_description": "Description (optional)",
     "file_photo": "Images (JPEG, PNG, WebP — up to 10)",
+    "media": "Media",
+    "media_limit": "up to 10",
+    "media_one": "one file",
+    "media_optional": "optional",
+    "cover": "Cover",
+    "media_add": "Add more",
     "file_gif": "Animated GIF",
     "file_audio": "Audio file (MP3, M4A, OGG)",
     "file_video": "Video file (MP4, WebM)",
@@ -75,6 +84,7 @@
     "tags": "Tags (comma separated, up to 10)",
     "nsfw": "18+ — sensitive content",
     "publish": "Publish",
+    "emoji": "Emoji",
     "save_draft": "Save draft",
     "preview": "Preview",
     "publishing": "Publishing…",
@@ -83,6 +93,15 @@
     "schedule_at": "Publish date and time",
     "schedule": "Schedule",
     "queue": "Add to queue",
+    "drop_title_one": "Drop a file here",
+    "drop_title_many": "Drop files here",
+    "drop_sub": "or choose from your disk",
+    "drop_over": "Release to upload",
+    "drop_replace_one": "File selected — click to replace",
+    "drop_add_many": "Click to add more",
+    "drop_remove": "Remove file",
+    "drop_bad_type": "This file type isn't supported.",
+    "drop_limit": "No more than {max} files.",
     "errors": {
       "required_file": "Attach a file.",
       "required_quote": "Enter the quote text.",
@@ -109,11 +128,22 @@
     "collapse": "Collapse",
     "private": "Followers only",
     "link_or_file": "Or a track link",
+    "video_link": "Video link",
     "link_hint_sc": "SoundCloud — paste a track link",
     "link_hint_yt": "YouTube or Vimeo — paste a video link"
   },
   "blog": {
     "settings_title": "Blog settings",
+    "settings_hint": "Profile, appearance and social settings of your blog.",
+    "section_edit": "Edit blog",
+    "section_edit_hint": "Title, description and avatar.",
+    "section_customize": "Customize blog",
+    "section_customize_hint": "Accent color and custom background.",
+    "section_social": "Social settings",
+    "section_social_hint": "Questions, anonymity and time zone.",
+    "avatar_save": "Upload avatar",
+    "save_appearance": "Save appearance",
+    "save_social": "Save settings",
     "blog_title": "Blog title",
     "description": "Description",
     "theme": "Theme",
@@ -138,10 +168,25 @@
     "timezone_label": "Time zone (for scheduling and display)",
     "look_title": "Look",
     "accent_hint": "Colors the title and ask button on your blog page",
-    "banner": "Header banner",
-    "banner_upload": "Banner image (wide, cropped to 140px height)",
-    "banner_remove": "Remove banner",
-    "banner_remove_confirm": "Remove the banner?"
+    "background": "Custom background",
+    "background_hint": "Full-page blog background, darkened. A wide image, e.g. 1920×1080.",
+    "background_upload": "Background image (jpg, png, webp, gif)",
+    "background_save": "Upload background",
+    "background_remove": "Remove background",
+    "background_remove_confirm": "Remove the background?",
+    "tint": "Interface tint",
+    "tint_hint": "Recolors panels, buttons and links to match the background. Updates live, no save needed.",
+    "tint_auto": "From background image",
+    "tint_custom": "Custom color",
+    "tint_off": "No tint",
+    "tint_color": "Tint color",
+    "socials": "Social links",
+    "socials_hint": "Links to your profiles — shown in the blog header as colored badges with an icon.",
+    "social_add": "Add social link",
+    "social_remove": "Remove",
+    "social_label": "Label",
+    "social_url": "URL",
+    "social_network": "Network"
   },
   "drafts": {
     "title": "Drafts",
@@ -177,6 +222,7 @@
     "cancel": "Cancel",
     "back": "Back",
     "loading": "Loading…",
+    "nothing_here": "Nothing here yet",
     "home": "Home"
   },
   "pagination": {
@@ -340,5 +386,16 @@
   },
   "tags": {
     "mine": "My tags"
+  },
+  "social_net": {
+    "telegram": "Telegram",
+    "vk": "VK",
+    "instagram": "Instagram",
+    "x": "X (Twitter)",
+    "youtube": "YouTube",
+    "tiktok": "TikTok",
+    "soundcloud": "SoundCloud",
+    "spotify": "Spotify",
+    "website": "Website"
   }
 }

@@ -3,7 +3,7 @@
 {% case post.type %}
 {% when 'text' %}
   {% if post.title %}<h2 class="post-title">{{ post.title }}</h2>{% endif %}
-  <div class="post-body">{{ post.body_html }}</div>
+  <div class="post-body">{{ post.body_html | raw }}</div>
 {% when 'photo' %}
   <div class="post-media">
     {% for m in post.media %}
@@ -14,7 +14,7 @@
     {% endif %}
     {% endfor %}
   </div>
-  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+  {% if post.body_html %}<div class="post-body">{{ post.body_html | raw }}</div>{% endif %}
 {% when 'quote' %}
   <div class="post-quote">
     <p class="quote-text">«{{ post.quote_text }}»</p>
@@ -26,7 +26,7 @@
     {% if post.title %}
     <h2 class="post-title"><a href="{{ post.link_url }}" rel="nofollow noopener">{{ post.title }}</a></h2>
     {% endif %}
-    {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+    {% if post.body_html %}<div class="post-body">{{ post.body_html | raw }}</div>{% endif %}
   </div>
 {% when 'audio' %}
   {% assign audioItem = null %}
@@ -60,7 +60,7 @@
     </div>
   </div>
   {% endif %}
-  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+  {% if post.body_html %}<div class="post-body">{{ post.body_html | raw }}</div>{% endif %}
 {% when 'video' %}
   {% assign videoItem = null %}
   {% for m in post.media %}
@@ -83,7 +83,7 @@
   </div>
   {% endif %}
   {% if post.title %}<h2 class="post-title">{{ post.title }}</h2>{% endif %}
-  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+  {% if post.body_html %}<div class="post-body">{{ post.body_html | raw }}</div>{% endif %}
 {% when 'gif' %}
   {% assign gifItem = null %}
   {% for m in post.media %}
@@ -99,5 +99,5 @@
     </figure>
   </div>
   {% endif %}
-  {% if post.body_html %}<div class="post-body">{{ post.body_html }}</div>{% endif %}
+  {% if post.body_html %}<div class="post-body">{{ post.body_html | raw }}</div>{% endif %}
 {% endcase %}

@@ -47,7 +47,10 @@
     "empty": "Здесь пока тихо. Создайте первый пост!",
     "created": "Пост опубликован.",
     "draft_saved": "Черновик сохранён.",
-    "feed_hint": "Подпишитесь на блоги — их новые посты появятся здесь в хронологическом порядке."
+    "feed_hint": "Подпишитесь на блоги — их новые посты появятся здесь в хронологическом порядке.",
+    "tab_general": "Общая лента",
+    "tab_subscriptions": "Подписки",
+    "general_hint": "Здесь появятся посты всех блогов."
   },
   "composer": {
     "new_post": "Новый пост",
@@ -67,6 +70,12 @@
     "link_title": "Заголовок ссылки (необязательно)",
     "link_description": "Описание (необязательно)",
     "file_photo": "Изображения (JPEG, PNG, WebP — до 10 шт.)",
+    "media": "Медиа",
+    "media_limit": "до 10 шт",
+    "media_one": "один файл",
+    "media_optional": "необязательно",
+    "cover": "Обложка",
+    "media_add": "Добавить ещё",
     "file_gif": "Анимированный GIF",
     "file_audio": "Аудиофайл (MP3, M4A, OGG)",
     "file_video": "Видеофайл (MP4, WebM)",
@@ -75,6 +84,7 @@
     "tags": "Теги (через запятую, до 10)",
     "nsfw": "18+ — чувствительный контент",
     "publish": "Опубликовать",
+    "emoji": "Эмодзи",
     "save_draft": "Сохранить черновик",
     "preview": "Предпросмотр",
     "publishing": "Публикуем…",
@@ -83,6 +93,15 @@
     "schedule_at": "Дата и время публикации",
     "schedule": "Запланировать",
     "queue": "В очередь",
+    "drop_title_one": "Перетащите файл сюда",
+    "drop_title_many": "Перетащите файлы сюда",
+    "drop_sub": "или выберите на диске",
+    "drop_over": "Отпустите, чтобы загрузить",
+    "drop_replace_one": "Файл выбран — нажмите, чтобы заменить",
+    "drop_add_many": "Нажмите, чтобы добавить ещё",
+    "drop_remove": "Убрать файл",
+    "drop_bad_type": "Этот файл не подходит по типу.",
+    "drop_limit": "Можно не больше {max} файлов.",
     "errors": {
       "required_file": "Приложите файл.",
       "required_quote": "Введите текст цитаты.",
@@ -109,11 +128,22 @@
     "collapse": "Свернуть",
     "private": "Только для подписчиков",
     "link_or_file": "Или ссылка на трек",
+    "video_link": "Ссылка на видео",
     "link_hint_sc": "SoundCloud — вставьте ссылку на трек",
     "link_hint_yt": "YouTube или Vimeo — вставьте ссылку на видео"
   },
   "blog": {
     "settings_title": "Настройки блога",
+    "settings_hint": "Профиль, оформление и социальные настройки блога.",
+    "section_edit": "Редактирование блога",
+    "section_edit_hint": "Название, описание и аватар.",
+    "section_customize": "Кастомизация блога",
+    "section_customize_hint": "Акцентный цвет и кастомный фон.",
+    "section_social": "Настройки соц сети",
+    "section_social_hint": "Вопросы, анонимность и часовой пояс.",
+    "avatar_save": "Загрузить аватар",
+    "save_appearance": "Сохранить оформление",
+    "save_social": "Сохранить настройки",
     "blog_title": "Название блога",
     "description": "Описание",
     "theme": "Тема",
@@ -138,10 +168,25 @@
     "timezone_label": "Часовой пояс (для планирования и отображения)",
     "look_title": "Оформление",
     "accent_hint": "Красит заголовок и кнопку вопросов на странице блога",
-    "banner": "Баннер-шапка",
-    "banner_upload": "Картинка баннера (широкая, обрежется по высоте 140px)",
-    "banner_remove": "Убрать баннер",
-    "banner_remove_confirm": "Убрать баннер?"
+    "background": "Кастомный фон",
+    "background_hint": "Фон на всю страницу блога, затемнённый. Широкая картинка, например 1920×1080.",
+    "background_upload": "Картинка фона (jpg, png, webp, gif)",
+    "background_save": "Загрузить фон",
+    "background_remove": "Убрать фон",
+    "background_remove_confirm": "Убрать фон?",
+    "tint": "Оттенок интерфейса",
+    "tint_hint": "Перекрашивает панели, кнопки и ссылки в тон фону. Меняется сразу, без сохранения.",
+    "tint_auto": "По картинке фона",
+    "tint_custom": "Свой цвет",
+    "tint_off": "Не перекрашивать",
+    "tint_color": "Цвет оттенка",
+    "socials": "Соцсети",
+    "socials_hint": "Ссылки на профили — покажутся в шапке блога цветными кнопками со значком.",
+    "social_add": "Добавить соцсеть",
+    "social_remove": "Удалить",
+    "social_label": "Подпись",
+    "social_url": "Ссылка",
+    "social_network": "Сеть"
   },
   "drafts": {
     "title": "Черновики",
@@ -177,6 +222,7 @@
     "cancel": "Отмена",
     "back": "Назад",
     "loading": "Загрузка…",
+    "nothing_here": "Пока тут ничего нет",
     "home": "На главную"
   },
   "pagination": {
@@ -340,5 +386,16 @@
   },
   "tags": {
     "mine": "Мои теги"
+  },
+  "social_net": {
+    "telegram": "Telegram",
+    "vk": "VK",
+    "instagram": "Instagram",
+    "x": "X (Twitter)",
+    "youtube": "YouTube",
+    "tiktok": "TikTok",
+    "soundcloud": "SoundCloud",
+    "spotify": "Spotify",
+    "website": "Сайт"
   }
 }

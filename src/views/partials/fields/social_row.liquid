@@ -1,0 +1,11 @@
+{% comment %} Одна строка соцсети в настройках. Параметры: s (network/label/url), networks (список). {% endcomment %}
+<div class="social-row">
+  <select name="social_network" aria-label="{{ 'blog.social_network' | t: locale }}">
+    {% for n in networks %}
+    <option value="{{ n.id }}"{% if n.id == s.network %} selected{% endif %}>{{ n.title }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="social_label" maxlength="40" value="{{ s.label }}" placeholder="{{ 'blog.social_label' | t: locale }}" aria-label="{{ 'blog.social_label' | t: locale }}">
+  <input type="url" name="social_url" maxlength="300" value="{{ s.url }}" placeholder="https://…" aria-label="{{ 'blog.social_url' | t: locale }}">
+  <button type="button" class="btn btn-ghost btn-sm js-social-remove" aria-label="{{ 'blog.social_remove' | t: locale }}">×</button>
+</div>

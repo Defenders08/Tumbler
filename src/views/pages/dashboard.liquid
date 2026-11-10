@@ -3,18 +3,24 @@
 <div class="feed">
     {% include 'partials/composer', blog: blog, composerError: composerError, composerErrorNote: composerErrorNote, openType: openType, values: values %}
 
+    <nav class="feed-tabs" aria-label="{{ 'dashboard.title' | t: locale }}">
+      <a class="feed-tab{% if tab == 'general' %} is-active{% endif %}" href="/dashboard?tab=general"{% if tab == 'general' %} aria-current="page"{% endif %}>{{ 'dashboard.tab_general' | t: locale }}</a>
+      <a class="feed-tab{% if tab == 'subscriptions' %} is-active{% endif %}" href="/dashboard?tab=subscriptions"{% if tab == 'subscriptions' %} aria-current="page"{% endif %}>{{ 'dashboard.tab_subscriptions' | t: locale }}</a>
+      <button type="button" class="feed-tab-add" title="{{ 'composer.new_post' | t: locale }}" aria-label="{{ 'composer.new_post' | t: locale }}"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button>
+    </nav>
+
     {% if flash %}<div class="flash-banner flash-ok" role="status">{{ flash }}</div>{% endif %}
     {% if commentError %}<div class="flash-banner flash-error" role="alert">{{ commentError }}</div>{% endif %}
 
     {% if posts.size == 0 %}
-    {% assign emptyHint = 'dashboard.feed_hint' | t: locale %}
-    {% assign emptyText = 'dashboard.empty' | t: locale, hint: emptyHint %}
+    {% assign emptyText = 'common.nothing_here' | t: locale %}
+    {% include 'partials/empty', text: emptyText, hint: feedHint %}
     {% endif %}
 
     {% for p in posts %}
     {% include 'partials/post_card', post: p, tz: user.timezone, back: 'dashboard' %}
     {% endfor %}
 
-    {% include 'partials/pagination', page: page, pages: pages, basePath: '/dashboard' %}
+    {% include 'partials/pagination', page: page, pages: pages, basePath: feedBase %}
 </div>
 {% endblock %}

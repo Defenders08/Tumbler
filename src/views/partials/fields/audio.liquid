@@ -1,21 +1,36 @@
-{% comment %} Поля аудио-поста: файл + необложка + название + подпись. {% endcomment %}
+{% comment %} Поля аудио-поста: медиа слева, подпись справа, название и ссылка — строкой, обложка — ниже. {% endcomment %}
 {% if mode == 'new' %}
-<div class="field">
-  <label for="{{ prefix }}file">{{ 'composer.file_audio' | t: locale }}</label>
-  <input type="file" id="{{ prefix }}file" name="file" accept="audio/mpeg,audio/mp4,audio/ogg,.mp3,.m4a,.ogg">
+<div class="composer-split">
+  <div class="field field-media">
+    <label for="{{ prefix }}file">{{ 'composer.media' | t: locale }}</label>
+    <input type="file" id="{{ prefix }}file" name="file" accept="audio/mpeg,audio/mp4,audio/ogg,.mp3,.m4a,.ogg" data-drop-layout="tiles"
+           data-drop-title="MP3, M4A, OGG"
+           data-drop-sub="{{ 'composer.media_one' | t: locale }}">
+  </div>
+  <div class="field field-caption">
+    <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
+    <textarea id="{{ prefix }}body" name="body" rows="4">{{ values.body }}</textarea>
+  </div>
+</div>
+<div class="field-row composer-extra">
+  <div class="field">
+    <label for="{{ prefix }}title">{{ 'composer.audio_title' | t: locale }}</label>
+    <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+  </div>
+  <div class="field">
+    <label for="{{ prefix }}link">{{ 'composer.link_or_file' | t: locale }}</label>
+    <input type="url" id="{{ prefix }}link" name="link_url" placeholder="https://soundcloud.com/..." value="{{ values.link_url }}">
+    <p class="hint">{{ 'composer.link_hint_sc' | t: locale }}</p>
+  </div>
 </div>
 <div class="field">
-  <label for="{{ prefix }}link">{{ 'composer.link_or_file' | t: locale }}</label>
-  <input type="url" id="{{ prefix }}link" name="link_url" placeholder="https://soundcloud.com/..." value="{{ values.link_url }}">
-  <p class="hint">{{ 'composer.link_hint_sc' | t: locale }}</p>
-</div>
-<div class="field">
-  <label for="{{ prefix }}cover">{{ 'composer.file_avatar' | t: locale }}</label>
-  <input type="file" id="{{ prefix }}cover" name="cover" accept="image/jpeg,image/png,image/webp,image/gif">
+  <label for="{{ prefix }}cover">{{ 'composer.cover' | t: locale }}</label>
+  <input type="file" id="{{ prefix }}cover" name="cover" accept="image/jpeg,image/png,image/webp,image/gif"
+         data-drop-title="JPEG, PNG"
+         data-drop-sub="{{ 'composer.media_optional' | t: locale }}">
 </div>
 {% else %}
 <p class="hint">{{ 'composer.file_note' | t: locale }}</p>
-{% endif %}
 <div class="field">
   <label for="{{ prefix }}title">{{ 'composer.audio_title' | t: locale }}</label>
   <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
@@ -24,3 +39,4 @@
   <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
   <textarea id="{{ prefix }}body" name="body" rows="3">{{ values.body }}</textarea>
 </div>
+{% endif %}

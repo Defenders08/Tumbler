@@ -3,7 +3,6 @@
 <div class="narrow-page">
   <div class="page-heading">
     <h1>{{ 'ask.inbox' | t: locale }}{% if newCount > 0 %} ({{ newCount }}){% endif %}</h1>
-    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
   </div>
 
   {% if asks.size == 0 %}

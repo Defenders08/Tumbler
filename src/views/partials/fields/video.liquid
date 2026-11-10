@@ -1,17 +1,30 @@
-{% comment %} Поля видео-поста. {% endcomment %}
+{% comment %} Поля видео-поста: медиа слева, подпись справа, название и ссылка — строкой ниже. {% endcomment %}
 {% if mode == 'new' %}
-<div class="field">
-  <label for="{{ prefix }}file">{{ 'composer.file_video' | t: locale }}</label>
-  <input type="file" id="{{ prefix }}file" name="file" accept="video/mp4,video/webm,.mp4,.webm">
+<div class="composer-split">
+  <div class="field field-media">
+    <label for="{{ prefix }}file">{{ 'composer.media' | t: locale }}</label>
+    <input type="file" id="{{ prefix }}file" name="file" accept="video/mp4,video/webm,.mp4,.webm" data-drop-layout="tiles"
+           data-drop-title="MP4, WebM"
+           data-drop-sub="{{ 'composer.media_one' | t: locale }}">
+  </div>
+  <div class="field field-caption">
+    <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
+    <textarea id="{{ prefix }}body" name="body" rows="4">{{ values.body }}</textarea>
+  </div>
 </div>
-<div class="field">
-  <label for="{{ prefix }}link">{{ 'composer.link_or_file' | t: locale }}</label>
-  <input type="url" id="{{ prefix }}link" name="link_url" placeholder="https://youtube.com/watch?v=..." value="{{ values.link_url }}">
-  <p class="hint">{{ 'composer.link_hint_yt' | t: locale }}</p>
+<div class="field-row composer-extra">
+  <div class="field">
+    <label for="{{ prefix }}title">{{ 'composer.title' | t: locale }}</label>
+    <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+  </div>
+  <div class="field">
+    <label for="{{ prefix }}link">{{ 'composer.video_link' | t: locale }}</label>
+    <input type="url" id="{{ prefix }}link" name="link_url" placeholder="https://youtube.com/watch?v=..." value="{{ values.link_url }}">
+    <p class="hint">{{ 'composer.link_hint_yt' | t: locale }}</p>
+  </div>
 </div>
 {% else %}
 <p class="hint">{{ 'composer.file_note' | t: locale }}</p>
-{% endif %}
 <div class="field">
   <label for="{{ prefix }}title">{{ 'composer.title' | t: locale }}</label>
   <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
@@ -20,3 +33,4 @@
   <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
   <textarea id="{{ prefix }}body" name="body" rows="3">{{ values.body }}</textarea>
 </div>
+{% endif %}

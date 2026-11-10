@@ -1,0 +1,12 @@
+{% comment %} Флаги поста: 18+ и «только для подписчиков» — только иконки.
+     Живут в строке действий, в одной капсуле с «Опубликовать». Параметры: values. {% endcomment %}
+<div class="composer-flags">
+  <label class="flag-chip flag-nsfw" title="{{ 'composer.nsfw' | t: locale }}">
+    <input type="checkbox" name="nsfw" {% if values.nsfw == 'on' %}checked{% endif %} aria-label="{{ 'composer.nsfw' | t: locale }}">
+    <svg class="icon" aria-hidden="true"><use href="#i-nsfw"/></svg>
+  </label>
+  <label class="flag-chip flag-private" title="{{ 'composer.private' | t: locale }}">
+    <input type="checkbox" name="visibility" value="private" {% if values.visibility == 'private' %}checked{% endif %} aria-label="{{ 'composer.private' | t: locale }}">
+    <svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>
+  </label>
+</div>

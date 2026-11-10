@@ -1,98 +1,161 @@
 {% layout 'layout' %}
 {% block content %}
-<div class="narrow-page">
+<div class="narrow-page settings-page">
   <div class="page-heading">
     <h1>{{ 'blog.settings_title' | t: locale }}</h1>
-    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
   </div>
 
   {% if saved %}<div class="flash-banner flash-ok" role="status">{{ 'blog.saved' | t: locale }}</div>{% endif %}
   {% if avatarSaved %}<div class="flash-banner flash-ok" role="status">{{ 'blog.avatar_saved' | t: locale }}</div>{% endif %}
   {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
 
-  <section class="card form-card">
-    <form method="post" action="/settings/blog">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+  <div class="settings-stack">
 
-      <div class="field">
-        <label for="s-title">{{ 'blog.blog_title' | t: locale }}</label>
-        <input type="text" id="s-title" name="title" maxlength="100" value="{{ values.title }}" required>
-      </div>
-      <div class="field">
-        <label for="s-desc">{{ 'blog.description' | t: locale }}</label>
-        <textarea id="s-desc" name="description" rows="3" maxlength="500">{{ values.description }}</textarea>
-      </div>
+    <section class="card settings-card">
+      <div class="settings-card-body">
+        <form method="post" action="/settings/blog/avatar" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <div class="settings-avatar-row">
+            <div class="avatar-preview">
+              {% if blog.avatar_key %}
+              <img src="/media/{{ blog.avatar_key }}" alt="">
+              {% else %}
+              <span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span>
+              {% endif %}
+            </div>
+            <div class="settings-avatar-controls">
+              <div class="field">
+                <label for="s-avatar">{{ 'composer.file_avatar' | t: locale }}</label>
+                <input type="file" id="s-avatar" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" required>
+              </div>
+              <div class="settings-actions settings-actions-inline">
+                <button type="submit" class="btn btn-secondary btn-sm">{{ 'blog.avatar_save' | t: locale }}</button>
+              </div>
+            </div>
+          </div>
+        </form>
 
-      <h2 class="form-section">{{ 'blog.timezone_label' | t: locale }}</h2>
-      <div class="field">
-        <select id="s-tz" name="timezone">
-          {% for tz in timezones %}
-          <option value="{{ tz }}" {% if user.timezone == tz %}selected{% endif %}>{{ tz }}</option>
-          {% endfor %}
-        </select>
-      </div>
+        <div class="settings-divider"></div>
 
-      <h2 class="form-section">{{ 'blog.look_title' | t: locale }}</h2>
-      <div class="field">
-        <label for="s-accent">{{ 'blog.accent_color' | t: locale }}</label>
-        <input type="color" id="s-accent" name="accent_color" value="{{ theme.accentColor }}">
-        <p class="hint">{{ 'blog.accent_hint' | t: locale }}</p>
-      </div>
+        <form method="post" action="/settings/blog">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <input type="hidden" name="section" value="profile">
+          <div class="field">
+            <label for="s-title">{{ 'blog.blog_title' | t: locale }}</label>
+            <input type="text" id="s-title" name="title" maxlength="100" value="{{ values.title }}" required>
+          </div>
+          <div class="field">
+            <label for="s-desc">{{ 'blog.description' | t: locale }}</label>
+            <textarea id="s-desc" name="description" rows="3" maxlength="500">{{ values.description }}</textarea>
+          </div>
+          <div class="settings-divider"></div>
 
-      <h2 class="form-section">{{ 'ask.title' | t: locale }}</h2>
-      <label class="checkbox-field">
-        <input type="checkbox" name="ask_enabled" {% if blog.ask_enabled %}checked{% endif %}>
-        <span>{{ 'blog.ask_enabled' | t: locale }}</span>
-      </label>
-      <label class="checkbox-field">
-        <input type="checkbox" name="ask_anonymous" {% if blog.ask_anonymous %}checked{% endif %}>
-        <span>{{ 'blog.ask_anonymous' | t: locale }}</span>
-      </label>
+          <h3 class="settings-subhead">{{ 'blog.socials' | t: locale }}</h3>
+          <p class="hint">{{ 'blog.socials_hint' | t: locale }}</p>
+          <div class="social-list js-social-list">
+            {% if theme.socials.size == 0 %}
+            {% include 'partials/fields/social_row', networks: networks %}
+            {% else %}
+            {% for s in theme.socials %}
+            {% include 'partials/fields/social_row', s: s, networks: networks %}
+            {% endfor %}
+            {% endif %}
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm js-social-add">{{ 'blog.social_add' | t: locale }}</button>
 
-      <div class="form-actions">
-        <button type="submit" name="action" value="save" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+          </div>
+        </form>
       </div>
-    </form>
-  </section>
+    </section>
 
-  <section class="card form-card">
-    <h2 class="form-section">{{ 'blog.avatar' | t: locale }}</h2>
-    <div class="avatar-preview">
-      {% if blog.avatar_key %}
-      <img src="/media/{{ blog.avatar_key }}" alt="">
-      {% else %}
-      <span class="avatar-letter">{{ blog.slug | slice: 0, 1 }}</span>
-      {% endif %}
-    </div>
-    <form method="post" action="/settings/blog/avatar" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      <div class="field">
-        <label for="s-avatar">{{ 'composer.file_avatar' | t: locale }}</label>
-        <input type="file" id="s-avatar" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" required>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
-      </div>
-    </form>
+    <section class="card settings-card">
+      <div class="settings-card-body">
+        <form method="post" action="/settings/blog">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <input type="hidden" name="section" value="appearance">
+          <div class="field">
+            <label for="s-accent">{{ 'blog.accent_color' | t: locale }}</label>
+            <div class="accent-row">
+              <input type="color" id="s-accent" name="accent_color" value="{{ theme.accentColor }}">
+              <p class="hint">{{ 'blog.accent_hint' | t: locale }}</p>
+            </div>
+          </div>
 
-    <h2 class="form-section">{{ 'blog.banner' | t: locale }}</h2>
-    {% if theme.bannerKey %}
-    <div class="banner-preview"><img src="/media/{{ theme.bannerKey }}" alt=""></div>
-    <form method="post" action="/settings/blog/banner/remove" class="inline-form js-confirm" data-confirm="{{ 'blog.banner_remove_confirm' | t: locale }}">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      <button type="submit" class="btn btn-secondary btn-sm">{{ 'blog.banner_remove' | t: locale }}</button>
-    </form>
-    {% endif %}
-    <form method="post" action="/settings/blog/banner" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      <div class="field">
-        <label for="s-banner">{{ 'blog.banner_upload' | t: locale }}</label>
-        <input type="file" id="s-banner" name="banner" accept="image/jpeg,image/png,image/webp,image/gif" {% if theme.bannerKey == null %}required{% endif %}>
+          <div class="settings-divider"></div>
+
+          <h3 class="settings-subhead">{{ 'blog.tint' | t: locale }}</h3>
+          <p class="hint">{{ 'blog.tint_hint' | t: locale }}</p>
+          <div class="tint-options">
+            <label class="radio-field"><input type="radio" name="tint_mode" value="auto" {% if theme.tintMode == 'auto' %}checked{% endif %}><span>{{ 'blog.tint_auto' | t: locale }}</span></label>
+            <label class="radio-field"><input type="radio" name="tint_mode" value="custom" {% if theme.tintMode == 'custom' %}checked{% endif %}><span>{{ 'blog.tint_custom' | t: locale }}</span></label>
+            <label class="radio-field"><input type="radio" name="tint_mode" value="off" {% if theme.tintMode == 'off' %}checked{% endif %}><span>{{ 'blog.tint_off' | t: locale }}</span></label>
+          </div>
+          <div class="tint-color-row">
+            <input type="color" id="s-tint" name="tint_color" value="{{ theme.tintColor }}">
+            <label for="s-tint">{{ 'blog.tint_color' | t: locale }}</label>
+          </div>
+
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-primary">{{ 'blog.save_appearance' | t: locale }}</button>
+          </div>
+        </form>
+
+        <div class="settings-divider"></div>
+
+        <h3 class="settings-subhead">{{ 'blog.background' | t: locale }}</h3>
+        {% if theme.backgroundKey %}
+        <div class="background-preview"><img src="/media/{{ theme.backgroundKey }}" alt=""></div>
+        <form method="post" action="/settings/blog/background/remove" class="inline-form js-confirm" data-confirm="{{ 'blog.background_remove_confirm' | t: locale }}">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <button type="submit" class="btn btn-secondary btn-sm">{{ 'blog.background_remove' | t: locale }}</button>
+        </form>
+        {% endif %}
+        <form method="post" action="/settings/blog/background" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <div class="field">
+            <label for="s-background">{{ 'blog.background_upload' | t: locale }}</label>
+            <input type="file" id="s-background" name="background" accept="image/jpeg,image/png,image/webp,image/gif" {% if theme.backgroundKey == null %}required{% endif %}>
+            <p class="hint">{{ 'blog.background_hint' | t: locale }}</p>
+          </div>
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-primary">{{ 'blog.background_save' | t: locale }}</button>
+          </div>
+        </form>
       </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">{{ 'blog.save' | t: locale }}</button>
+    </section>
+
+    <section class="card settings-card">
+      <div class="settings-card-body">
+        <form method="post" action="/settings/blog">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <input type="hidden" name="section" value="social">
+          <div class="field">
+            <label for="s-tz">{{ 'blog.timezone_label' | t: locale }}</label>
+            <select id="s-tz" name="timezone">
+              {% for tz in timezones %}
+              <option value="{{ tz }}" {% if user.timezone == tz %}selected{% endif %}>{{ tz }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <label class="checkbox-field">
+            <input type="checkbox" name="ask_enabled" {% if blog.ask_enabled %}checked{% endif %}>
+            <span>{{ 'blog.ask_enabled' | t: locale }}</span>
+          </label>
+          <label class="checkbox-field">
+            <input type="checkbox" name="ask_anonymous" {% if blog.ask_anonymous %}checked{% endif %}>
+            <span>{{ 'blog.ask_anonymous' | t: locale }}</span>
+          </label>
+
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-primary">{{ 'blog.save_social' | t: locale }}</button>
+          </div>
+        </form>
       </div>
-    </form>
-  </section>
+    </section>
+
+  </div>
 </div>
 {% endblock %}

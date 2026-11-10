@@ -5,7 +5,7 @@ import sharp from 'sharp';
 
 const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const VIDEO_MIMES = new Set(['video/mp4', 'video/webm']);
-const AUDIO_MIMES = new Set(['audio/mpeg', 'audio/mp4', 'audio/ogg', 'application/ogg']);
+const AUDIO_MIMES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/ogg', 'application/ogg']);
 const MAX_IMAGE_EDGE = 1280;
 
 export class MediaError extends Error {
@@ -37,9 +37,11 @@ export async function processUpload(buffer, purpose, limits) {
     if (!IMAGE_MIMES.has(mime)) throw new MediaError('composer.errors.bad_image');
     if (buffer.byteLength > limits.image) throw new MediaError('composer.errors.too_large_image');
     // Перекодировка снимает EXIF и ограничивает размер; GIF сюда не попадает.
+    // Фон блога — на всю страницу, поэтому допускаем крупнее, чем обычные картинки.
+    const maxEdge = purpose === 'cover' ? 1920 : MAX_IMAGE_EDGE;
     const processed = await sharp(buffer)
       .rotate()
-      .resize({ width: MAX_IMAGE_EDGE, height: MAX_IMAGE_EDGE, fit: 'inside', withoutEnlargement: true })
+      .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true })
       .toBuffer();
     const meta = await sharp(processed).metadata();
     return { buffer: processed, mime, ext, kind: purpose === 'image' ? 'image' : purpose, width: meta.width, height: meta.height };

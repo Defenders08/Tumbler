@@ -94,7 +94,10 @@ export async function createAgent(base) {
     async postForm(pathname, fields) {
       const body = new URLSearchParams();
       for (const [key, value] of Object.entries(fields)) {
-        if (value !== undefined && value !== null) body.set(key, String(value));
+        if (value === undefined || value === null) continue;
+        // Массивы повторяют ключ — как настоящая форма (соцсети, несколько значений).
+        if (Array.isArray(value)) value.forEach((item) => body.append(key, String(item)));
+        else body.set(key, String(value));
       }
       const res = await fetch(base + pathname, {
         method: 'POST',

@@ -1,11 +1,14 @@
-{% comment %} Поля ссылки. Сервер не обращается к внешнему URL — карточка собирается без fetch. {% endcomment %}
-<div class="field">
-  <label for="{{ prefix }}url">{{ 'composer.url' | t: locale }}</label>
-  <input type="url" id="{{ prefix }}url" name="url" placeholder="https://" maxlength="2048" value="{{ values.url }}" required>
-</div>
-<div class="field">
-  <label for="{{ prefix }}title">{{ 'composer.link_title' | t: locale }}</label>
-  <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+{% comment %} Поля ссылки. Сервер не обращается к внешнему URL — карточка собирается без fetch.
+     «Адрес» и «Заголовок» стоят в одной строке пополам. {% endcomment %}
+<div class="field-row composer-extra field-joined">
+  <div class="field">
+    <label for="{{ prefix }}url">{{ 'composer.url' | t: locale }}</label>
+    <input type="url" id="{{ prefix }}url" name="url" placeholder="https://" maxlength="2048" value="{{ values.url }}" required>
+  </div>
+  <div class="field">
+    <label for="{{ prefix }}title">{{ 'composer.link_title' | t: locale }}</label>
+    <input type="text" id="{{ prefix }}title" name="title" maxlength="200" value="{{ values.title }}">
+  </div>
 </div>
 <div class="field">
   <label for="{{ prefix }}description">{{ 'composer.link_description' | t: locale }}</label>

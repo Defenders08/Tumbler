@@ -1,18 +1,20 @@
 {% layout 'layout' %}
 {% block content %}
 <div class="auth-wrap">
-  <section class="card auth-card">
-    <h1>{{ 'auth.login.title' | t: locale }}</h1>
+  <section class="auth-card">
+    <h1 class="auth-logo">tumbler.<span class="sr-only"> — {{ 'auth.login.title' | t: locale }}</span></h1>
     {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
-    <form method="post" action="/login">
+    <form method="post" action="/login" class="auth-form">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      <div class="field">
-        <label for="email">{{ 'auth.login.email' | t: locale }}</label>
-        <input type="email" id="email" name="email" value="{{ values.email }}" required autocomplete="email">
-      </div>
-      <div class="field">
-        <label for="password">{{ 'auth.login.password' | t: locale }}</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password">
+      <div class="auth-fields">
+        <div class="field">
+          <label class="sr-only" for="email">{{ 'auth.login.email' | t: locale }}</label>
+          <input type="email" id="email" name="email" value="{{ values.email }}" required autocomplete="email" placeholder="{{ 'auth.login.email' | t: locale }}">
+        </div>
+        <div class="field">
+          <label class="sr-only" for="password">{{ 'auth.login.password' | t: locale }}</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="{{ 'auth.login.password' | t: locale }}">
+        </div>
       </div>
       <button type="submit" class="btn btn-primary btn-block">{{ 'auth.login.submit' | t: locale }}</button>
     </form>

@@ -8,10 +8,13 @@
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   {% if csrfToken %}<meta name="csrf-token" content="{{ csrfToken }}">{% endif %}
   {% if theme and theme.accentColor %}
-  <style>.blog-identity { --blog-accent: {{ theme.accentColor }}; } .blog-identity .blog-title a, .blog-identity .blog-ask a { color: var(--blog-accent, {{ theme.accentColor }}); }</style>
-  {% endif %}
-</head>
-<body class="{{ pageClass | default: 'dash' }}-page">
+  <style>.blog-identity { --blog-accent: {{ theme.accentColor }}; }</style>
+  {% endif %}</head>
+{% assign showBlogBg = false %}
+{% if pageClass == 'blog' and theme.backgroundKey %}{% assign showBlogBg = true %}{% endif %}
+{% assign showBlogTint = false %}
+{% if theme.tintShift != null %}{% assign showBlogTint = true %}{% endif %}
+<body class="{{ pageClass | default: 'dash' }}-page{% if showBlogTint %} has-blog-tint{% endif %}{% if showBlogBg %} has-blog-bg{% endif %}"{% if showBlogBg or showBlogTint %} style="{% if showBlogBg %}--blog-bg: url(/media/{{ theme.backgroundKey }});{% endif %}{% if showBlogTint %}--tint-shift: {{ theme.tintShift }};{% endif %}"{% endif %}{% if theme.backgroundHue != null %} data-bg-hue="{{ theme.backgroundHue }}"{% endif %}>
   {% include 'partials/icons' %}
   {% include 'partials/header' %}
 
@@ -43,6 +46,17 @@
     </a>
   </nav>
   {% endif %}
+
+  <div hidden class="js-dz-strings"
+       data-title-one="{{ 'composer.drop_title_one' | t: locale }}"
+       data-title-many="{{ 'composer.drop_title_many' | t: locale }}"
+       data-sub="{{ 'composer.drop_sub' | t: locale }}"
+       data-over="{{ 'composer.drop_over' | t: locale }}"
+       data-replace-one="{{ 'composer.drop_replace_one' | t: locale }}"
+       data-add-many="{{ 'composer.drop_add_many' | t: locale }}"
+       data-remove="{{ 'composer.drop_remove' | t: locale }}"
+       data-bad-type="{{ 'composer.drop_bad_type' | t: locale }}"
+       data-limit="{{ 'composer.drop_limit' | t: locale }}"></div>
 
   <script src="/static/vendor/turndown.js"></script>
   <script src="/static/js/tumbler.js" defer></script>

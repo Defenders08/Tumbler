@@ -86,7 +86,7 @@ function fillDays(rows, days) {
 }
 
 // SVG polyline-график: ширина 560, высота 120, без библиотек.
-export function svgChart(series, { width = 560, height = 120, color = '#5791bb' } = {}) {
+export function svgChart(series, { width = 560, height = 120, color = '#5e91b6' } = {}) {
   const max = Math.max(1, ...series.map((p) => p.n));
   const pad = 6;
   const step = (width - pad * 2) / Math.max(1, series.length - 1);

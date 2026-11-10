@@ -14,23 +14,13 @@
     </nav>
 
     <form class="top-search" method="get" action="/search" role="search">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-search"/></svg>
       <input type="search" name="q" value="" maxlength="100" placeholder="{{ 'search.placeholder' | t: locale }}" autocomplete="off">
     </form>
 
     <div class="top-actions">
-      <span class="lang-switch">
-        <a href="/set-lang/ru?back={{ currentPath | urlencode }}">RU</a>
-        <span aria-hidden="true">·</span>
-        <a href="/set-lang/en?back={{ currentPath | urlencode }}">EN</a>
-      </span>
-
       {% if user %}
       {% if pageClass == 'blog' and blog and isOwner == false %}
-      {% if isFollowing %}{% assign followLabel = 'social.following' %}{% else %}{% assign followLabel = 'social.follow' %}{% endif %}
-      <button type="button" class="btn btn-sm js-follow {% if isFollowing %}btn-secondary{% else %}btn-success{% endif %}"
-              data-slug="{{ blog.slug }}"
-              data-label-follow="{{ 'social.follow' | t: locale }}"
-              data-label-following="{{ 'social.following' | t: locale }}">{{ followLabel | t: locale }}</button>
       <a class="top-icon" href="/report/blog/{{ blog.id }}?back=/{{ blog.slug }}" title="{{ 'report.title' | t: locale }}">
         <svg class="icon"><use href="#i-warn"/></svg>
       </a>
@@ -58,9 +48,6 @@
         <button type="submit" class="btn btn-ghost btn-sm">{{ 'nav.logout' | t: locale }}</button>
       </form>
       {% else %}
-      {% if pageClass == 'blog' and blog and blog.ask_enabled %}
-      <a class="btn btn-ghost btn-sm" href="/{{ blog.slug }}/ask">{{ 'ask.title' | t: locale }}</a>
-      {% endif %}
       <a class="btn btn-secondary btn-sm" href="/login">{{ 'nav.login' | t: locale }}</a>
       <a class="btn btn-primary btn-sm" href="/register">{{ 'nav.register' | t: locale }}</a>
       {% endif %}

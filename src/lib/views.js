@@ -15,6 +15,8 @@ export function createLiquidEngine(config) {
     extname: '.liquid',
     cache: config.isProduction,
     jsTruthy: true,
+    // Всё пользовательское по умолчанию экранируется; доверенный HTML помечается | raw.
+    outputEscape: 'escape',
   });
 
   // {{ 'nav.dashboard' | t: locale }} — язык передаётся явно, без скрытого состояния.

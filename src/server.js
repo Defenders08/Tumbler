@@ -5,6 +5,7 @@ import { migrate } from './db/migrate.js';
 import { log } from './lib/logger.js';
 import { createApp } from './app.js';
 import { seedAdmin } from './modules/auth/service.js';
+import { backfillBackgroundHues } from './modules/blogs/service.js';
 import { purgeExpiredSessions } from './modules/auth/session.js';
 import { tmpDirCleanup } from './modules/media/multer.js';
 import { startScheduler } from './scheduler/index.js';
@@ -18,6 +19,8 @@ await seedAdmin(ctx, config, log);
 purgeExpiredSessions(ctx);
 
 const app = createApp(ctx);
+// Однократный догон оттенков для фонов, загруженных до появления перекраски.
+await backfillBackgroundHues(ctx);
 const server = app.listen(config.port, () => {
   log.info(`Tumbler запущен: http://localhost:${config.port} (${config.env})`);
 });

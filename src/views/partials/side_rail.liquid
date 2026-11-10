@@ -41,21 +41,23 @@
   </a>
 </aside>
 
-{% if myTags %}
 <aside class="side-block side-follows">
   <span class="side-heading">{{ 'tags.mine' | t: locale }}</span>
+  {% if myTags and myTags.size > 0 %}
   {% for t in myTags %}
   <a class="side-follow" href="/tag/{{ t.name }}">
     <span class="avatar-letter tag-letter">#</span>
     <span class="side-follow-title">{{ t.name }}</span>
   </a>
   {% endfor %}
+  {% else %}
+  <p class="side-empty">{{ 'common.nothing_here' | t: locale }}</p>
+  {% endif %}
 </aside>
-{% endif %}
 
-{% if subscriptions %}
 <aside class="side-block side-follows">
   <span class="side-heading">{{ 'social.subscriptions' | t: locale }} <span class="side-count">{{ subscriptionsCount }}</span></span>
+  {% if subscriptions and subscriptions.size > 0 %}
   {% for b in subscriptions %}
   <a class="side-follow" href="/{{ b.slug }}">
     {% if b.avatar_key %}
@@ -66,5 +68,7 @@
     <span class="side-follow-title">{{ b.title }}</span>
   </a>
   {% endfor %}
+  {% else %}
+  <p class="side-empty">{{ 'common.nothing_here' | t: locale }}</p>
+  {% endif %}
 </aside>
-{% endif %}

@@ -3,7 +3,6 @@
 <div class="narrow-page">
   <div class="page-heading">
     <h1>{{ 'notify.title' | t: locale }}</h1>
-    <a class="btn btn-secondary btn-sm" href="/dashboard">← {{ 'nav.dashboard' | t: locale }}</a>
   </div>
 
   {% if hadUnread > 0 %}<div class="flash-banner flash-info">{{ 'notify.marked_read' | t: locale, n: hadUnread }}</div>{% endif %}

@@ -1,36 +1,38 @@
 {% layout 'layout' %}
 {% block content %}
 <div class="auth-wrap">
-  <section class="card auth-card">
-    <h1>{{ 'auth.register.title' | t: locale }}</h1>
+  <section class="auth-card">
+    <h1 class="auth-logo">tumbler.<span class="sr-only"> — {{ 'auth.register.title' | t: locale }}</span></h1>
+    <p class="auth-sub">{{ 'auth.register.title' | t: locale }}</p>
     {% if error %}<div class="flash-banner flash-error" role="alert">{{ error }}</div>{% endif %}
-    <form method="post" action="/register">
+    <form method="post" action="/register" class="auth-form">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      <div class="field">
-        <label for="email">{{ 'auth.register.email' | t: locale }}</label>
-        <input type="email" id="email" name="email" value="{{ values.email }}" required autocomplete="email">
+      <div class="auth-fields">
+        <div class="field">
+          <label class="sr-only" for="email">{{ 'auth.register.email' | t: locale }}</label>
+          <input type="email" id="email" name="email" value="{{ values.email }}" required autocomplete="email" placeholder="{{ 'auth.register.email' | t: locale }}">
+        </div>
+        <div class="field">
+          <label class="sr-only" for="password">{{ 'auth.register.password' | t: locale }}</label>
+          <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="{{ 'auth.register.password' | t: locale }}">
+        </div>
+        <div class="field">
+          <label class="sr-only" for="slug">{{ 'auth.register.slug' | t: locale }}</label>
+          <input type="text" id="slug" name="slug" value="{{ values.slug }}" required pattern="[a-z0-9-]{3,32}" autocomplete="off" placeholder="{{ 'auth.register.slug' | t: locale }}">
+        </div>
+        <div class="field">
+          <label class="sr-only" for="blogtitle">{{ 'auth.register.title' | t: locale }}</label>
+          <input type="text" id="blogtitle" name="title" value="{{ values.title }}" maxlength="100" placeholder="{{ 'auth.register.title' | t: locale }}">
+        </div>
+        <div class="field">
+          <label class="sr-only" for="locale">{{ 'nav.settings' | t: locale }}: {{ 'blog.font' | t: locale }}?</label>
+          <select id="locale" name="locale">
+            <option value="ru" {% if values.locale != 'en' %}selected{% endif %}>Русский</option>
+            <option value="en" {% if values.locale == 'en' %}selected{% endif %}>English</option>
+          </select>
+        </div>
       </div>
-      <div class="field">
-        <label for="password">{{ 'auth.register.password' | t: locale }}</label>
-        <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
-      </div>
-      <div class="field">
-        <label for="slug">{{ 'auth.register.slug' | t: locale }}</label>
-        <input type="text" id="slug" name="slug" value="{{ values.slug }}" required pattern="[a-z0-9-]{3,32}" autocomplete="off">
-        <p class="hint">{{ 'auth.register.slug_hint' | t: locale }}</p>
-      </div>
-      <div class="field">
-        <label for="blogtitle">{{ 'auth.register.title' | t: locale }}</label>
-        <input type="text" id="blogtitle" name="title" value="{{ values.title }}" maxlength="100">
-        <p class="hint">{{ 'auth.register.title_hint' | t: locale }}</p>
-      </div>
-      <div class="field">
-        <label for="locale">{{ 'nav.settings' | t: locale }}: {{ 'blog.font' | t: locale }}?</label>
-        <select id="locale" name="locale">
-          <option value="ru" {% if values.locale != 'en' %}selected{% endif %}>Русский</option>
-          <option value="en" {% if values.locale == 'en' %}selected{% endif %}>English</option>
-        </select>
-      </div>
+      <p class="hint">{{ 'auth.register.slug_hint' | t: locale }} {{ 'auth.register.title_hint' | t: locale }}</p>
       <button type="submit" class="btn btn-primary btn-block">{{ 'auth.register.submit' | t: locale }}</button>
     </form>
     <p class="auth-alt"><a href="/login">{{ 'auth.register.to_login' | t: locale }}</a></p>

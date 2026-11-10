@@ -1,14 +1,23 @@
-{% comment %} Поля GIF-поста: только анимированный GIF (проверяется по содержимому). {% endcomment %}
+{% comment %} Поля GIF-поста: только анимированный GIF (проверяется по содержимому).
+     Раскладка как у фото: плитка слева, подпись справа. {% endcomment %}
 {% if mode == 'new' %}
-<div class="field">
-  <label for="{{ prefix }}file">{{ 'composer.file_gif' | t: locale }}</label>
-  <input type="file" id="{{ prefix }}file" name="file" accept="image/gif" required>
+<div class="composer-split">
+  <div class="field field-media">
+    <label for="{{ prefix }}file">{{ 'composer.media' | t: locale }}</label>
+    <input type="file" id="{{ prefix }}file" name="file" accept="image/gif" data-drop-layout="tiles" required
+           data-drop-title="GIF"
+           data-drop-sub="{{ 'composer.media_one' | t: locale }}">
+  </div>
+  <div class="field field-caption">
+    <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
+    <textarea id="{{ prefix }}body" name="body" rows="4">{{ values.body }}</textarea>
+  </div>
 </div>
 {% else %}
 <p class="hint">{{ 'composer.file_note' | t: locale }}</p>
-{% endif %}
 <div class="field">
   <label for="{{ prefix }}body">{{ 'composer.caption' | t: locale }}</label>
   <textarea id="{{ prefix }}body" name="body" rows="3">{{ values.body }}</textarea>
   <p class="hint">Markdown</p>
 </div>
+{% endif %}

@@ -34,8 +34,8 @@ export function pagesRoutes(ctx) {
         blog,
         stats: blogStats(ctx.db, blog.id),
         topPosts: topPostsByViews(ctx.db, blog.id, 5),
-        viewsChart: svgChart(viewsSeries(ctx.db, blog.id, 30), { color: '#5791bb' }),
-        likesChart: svgChart(likesSeries(ctx.db, blog.id, 30), { color: '#d95e40' }),
+        viewsChart: svgChart(viewsSeries(ctx.db, blog.id, 30), { color: '#5e91b6' }),
+        likesChart: svgChart(likesSeries(ctx.db, blog.id, 30), { color: '#d4604f' }),
         days: 30,
       });
     } catch (err) {
@@ -113,6 +113,7 @@ export function pagesRoutes(ctx) {
       const isOwner = Boolean(req.user && req.user.id === blogView.user_id);
       const isFollowing = viewerFollows(ctx, req, blogView);
       const followers = followerCount(ctx.db, blogView.id);
+      const following = followedCount(ctx.db, blogView.user_id);
 
       const page = Math.max(1, Number.parseInt(String(req.query.page ?? '1'), 10) || 1);
       // Приватные посты видят владелец, подписчики и модераторы/админы.
@@ -136,6 +137,7 @@ export function pagesRoutes(ctx) {
         isOwner,
         isFollowing,
         followers,
+        following,
         commentError,
       });
     } catch (err) {
